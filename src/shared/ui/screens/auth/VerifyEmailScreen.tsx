@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { AppState, type AppStateStatus } from "react-native";
 import { Button, Spinner, Text, View, YStack } from "tamagui";
 import { sendEmailVerification, reload } from "firebase/auth";
-import { auth } from "../../../config/firebase";
-import { useAuthStore } from "../../../stores/useAuthStore";
+import { auth } from "../../../api/firebase";
+import { useAuthStore } from "../../stores/useAuthStore";
 
 export default function VerifyEmailScreen() {
   const { user, setUser, signOut } = useAuthStore();
@@ -76,7 +76,7 @@ export default function VerifyEmailScreen() {
           onPress={handleResend}
           disabled={sending}
           backgroundColor="$primary"
-          borderRadius="$md"
+          borderRadius={9999}
           width="100%"
           icon={sending ? <Spinner color="white" /> : undefined}
         >

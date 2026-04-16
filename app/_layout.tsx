@@ -4,19 +4,20 @@ import { TamaguiProvider } from "tamagui";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../src/config/firebase";
-import { useAuthStore } from "../src/stores/useAuthStore";
-import tamaguiConfig, { fontAssets } from "../src/config/tamagui.config";
+import { auth } from "../src/shared/api/firebase";
+import { useAuthStore } from "../src/shared/ui/stores/useAuthStore";
+import tamaguiConfig, { fontAssets } from "../src/shared/ui/theme/tamagui.config";
 
 SplashScreen.preventAutoHideAsync();
 
-function AuthGuard() {
+function AuthGuard({ authReady }: { authReady: boolean }) {
   const router = useRouter();
   const segments = useSegments();
-  const { user, loading } = useAuthStore();
+  const user = useAuthStore((s) => s.user);
 
   useEffect(() => {
-    if (loading) return;
+    // No navegar hasta que Firebase haya resuelto el estado de sesión
+    if (!authReady) return;
 
     const inAuthGroup = segments[0] === "(auth)";
     const inAppGroup = segments[0] === "(app)";
@@ -35,7 +36,7 @@ function AuthGuard() {
         router.replace("/(app)");
       }
     }
-  }, [user, loading, segments]);
+  }, [user, authReady, segments]);
 
   return <Slot />;
 }
@@ -43,7 +44,6 @@ function AuthGuard() {
 export default function RootLayout() {
   const setUser = useAuthStore((s) => s.setUser);
   const [authReady, setAuthReady] = useState(false);
-
   const [fontsLoaded] = useFonts(fontAssets);
 
   useEffect(() => {
@@ -66,7 +66,7 @@ export default function RootLayout() {
 
   return (
     <TamaguiProvider config={tamaguiConfig} defaultTheme="light">
-      <AuthGuard />
+      <AuthGuard authReady={authReady} />
     </TamaguiProvider>
   );
 }

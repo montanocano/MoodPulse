@@ -1,1 +1,1 @@
-export { default } from "../../src/features/auth/screens/VerifyEmailScreen";
+export { default } from "../../src/shared/ui/screens/auth/VerifyEmailScreen";
