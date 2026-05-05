@@ -1,6 +1,6 @@
 import { Alert } from "react-native";
 import { Button, Text, View, YStack } from "tamagui";
-import { useAuthStore } from "../../src/shared/ui/stores/useAuthStore";
+import { useAuthStore } from "../../src/features/auth/store/authStore";
 
 export default function ProfileScreen() {
   const { user, signOut, loading } = useAuthStore();
@@ -10,14 +10,10 @@ export default function ProfileScreen() {
     .toUpperCase();
 
   function handleSignOut() {
-    Alert.alert(
-      "Cerrar sesión",
-      "¿Seguro que quieres cerrar sesión?",
-      [
-        { text: "Cancelar", style: "cancel" },
-        { text: "Cerrar sesión", style: "destructive", onPress: () => signOut() },
-      ]
-    );
+    Alert.alert("Cerrar sesión", "¿Seguro que quieres cerrar sesión?", [
+      { text: "Cancelar", style: "cancel" },
+      { text: "Cerrar sesión", style: "destructive", onPress: () => signOut() },
+    ]);
   }
 
   return (

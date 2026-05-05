@@ -58,7 +58,9 @@ export default function IntensitySlider({
                 borderColor={accentColor}
                 alignItems="center"
                 justifyContent="center"
-                style={isSelected ? { transform: [{ scale: 1.18 }] } : undefined}
+                style={
+                  isSelected ? { transform: [{ scale: 1.18 }] } : undefined
+                }
               >
                 <Text
                   fontSize={itemSize < 30 ? 11 : 13}

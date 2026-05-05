@@ -3,7 +3,7 @@ import { AppState, type AppStateStatus } from "react-native";
 import { Button, Spinner, Text, View, YStack } from "tamagui";
 import { sendEmailVerification, reload } from "firebase/auth";
 import { auth } from "../../../api/firebase";
-import { useAuthStore } from "../../stores/useAuthStore";
+import { useAuthStore } from "../../../../features/auth/store/authStore";
 
 export default function VerifyEmailScreen() {
   const { user, setUser, signOut } = useAuthStore();
@@ -29,10 +29,10 @@ export default function VerifyEmailScreen() {
           }
         }
         appState.current = nextState;
-      }
+      },
     );
     return () => subscription.remove();
-  }, []);
+  }, [setUser]);
 
   async function handleResend() {
     const currentUser = auth.currentUser;
@@ -47,9 +47,20 @@ export default function VerifyEmailScreen() {
   }
 
   return (
-    <View flex={1} backgroundColor="$background" justifyContent="center" alignItems="center" paddingHorizontal="$space.lg">
+    <View
+      flex={1}
+      backgroundColor="$background"
+      justifyContent="center"
+      alignItems="center"
+      paddingHorizontal="$space.lg"
+    >
       <YStack alignItems="center" gap="$space.lg" maxWidth={400}>
-        <Text fontFamily="$heading" fontSize={28} color="$primary" textAlign="center">
+        <Text
+          fontFamily="$heading"
+          fontSize={28}
+          color="$primary"
+          textAlign="center"
+        >
           Verifica tu correo
         </Text>
 

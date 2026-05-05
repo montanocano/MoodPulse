@@ -1,6 +1,9 @@
 import { createTamagui, createTokens } from "@tamagui/core";
-import { themes as defaultThemes } from "@tamagui/themes";
-import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold } from "@expo-google-fonts/inter";
+import {
+  Inter_400Regular,
+  Inter_600SemiBold,
+  Inter_700Bold,
+} from "@expo-google-fonts/inter";
 import {
   Poppins_600SemiBold,
   Poppins_700Bold,
@@ -329,6 +332,7 @@ const config = createTamagui({
 export type AppConfig = typeof config;
 
 declare module "tamagui" {
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   interface TamaguiCustomConfig extends AppConfig {}
 }
 

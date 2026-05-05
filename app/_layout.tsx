@@ -5,8 +5,10 @@ import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../src/shared/api/firebase";
-import { useAuthStore } from "../src/shared/ui/stores/useAuthStore";
-import tamaguiConfig, { fontAssets } from "../src/shared/ui/theme/tamagui.config";
+import { useAuthStore } from "../src/features/auth/store/authStore";
+import tamaguiConfig, {
+  fontAssets,
+} from "../src/shared/ui/theme/tamagui.config";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -36,7 +38,7 @@ function AuthGuard({ authReady }: { authReady: boolean }) {
         router.replace("/(app)");
       }
     }
-  }, [user, authReady, segments]);
+  }, [user, authReady, segments, router]);
 
   return <Slot />;
 }
@@ -52,7 +54,7 @@ export default function RootLayout() {
       setAuthReady(true);
     });
     return unsubscribe;
-  }, []);
+  }, [setUser]);
 
   useEffect(() => {
     if (fontsLoaded && authReady) {

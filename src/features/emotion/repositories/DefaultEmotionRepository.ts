@@ -19,7 +19,11 @@ export interface IEmotionRepository {
   /** Persist a new emotion record for the given date. */
   saveRecord(uid: string, date: string, data: NewEmotionRecord): Promise<void>;
   /** Merge partial updates into an existing record. */
-  updateRecord(uid: string, date: string, data: Partial<NewEmotionRecord>): Promise<void>;
+  updateRecord(
+    uid: string,
+    date: string,
+    data: Partial<NewEmotionRecord>,
+  ): Promise<void>;
 }
 
 // ── Firestore implementation ────────────────────────────────────────────────
@@ -27,11 +31,7 @@ export interface IEmotionRepository {
 class DefaultEmotionRepository implements IEmotionRepository {
   async loadRecords(uid: string, from: string): Promise<EmotionRecord[]> {
     const colRef = collection(db, "users", uid, "emotionRecords");
-    const q = query(
-      colRef,
-      where("date", ">=", from),
-      orderBy("date", "desc")
-    );
+    const q = query(colRef, where("date", ">=", from), orderBy("date", "desc"));
     const snapshot = await getDocs(q);
     return snapshot.docs.map((d) => ({
       ...(d.data() as Omit<EmotionRecord, "date">),
@@ -39,7 +39,11 @@ class DefaultEmotionRepository implements IEmotionRepository {
     }));
   }
 
-  async saveRecord(uid: string, date: string, data: NewEmotionRecord): Promise<void> {
+  async saveRecord(
+    uid: string,
+    date: string,
+    data: NewEmotionRecord,
+  ): Promise<void> {
     const docRef = doc(db, "users", uid, "emotionRecords", date);
     await setDoc(docRef, {
       emotion: data.emotion,
@@ -54,13 +58,18 @@ class DefaultEmotionRepository implements IEmotionRepository {
   async updateRecord(
     uid: string,
     date: string,
-    data: Partial<NewEmotionRecord>
+    data: Partial<NewEmotionRecord>,
   ): Promise<void> {
     const docRef = doc(db, "users", uid, "emotionRecords", date);
-    await setDoc(docRef, { ...data, updatedAt: serverTimestamp() }, { merge: true });
+    await setDoc(
+      docRef,
+      { ...data, updatedAt: serverTimestamp() },
+      { merge: true },
+    );
   }
 }
 
 // ── Singleton ───────────────────────────────────────────────────────────────
 
-export const emotionRepository: IEmotionRepository = new DefaultEmotionRepository();
+export const emotionRepository: IEmotionRepository =
+  new DefaultEmotionRepository();

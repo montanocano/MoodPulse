@@ -3,9 +3,9 @@ import { ScrollView } from "react-native";
 import { Button, Text, View, YStack, XStack } from "tamagui";
 import { useRouter, useFocusEffect } from "expo-router";
 import { EmotionType, EMOTION_CONFIG } from "../../../../types/emotion";
-import { useEmotionStore } from "../../stores/useEmotionStore";
-import EmotionCard from "../../../../features/emotion/widgets/EmotionCard";
-import IntensitySlider from "../../../../features/emotion/widgets/IntensitySlider";
+import { useEmotionStore } from "../../../../features/emotion/store/emotionStore";
+import EmotionCard from "../../components/EmotionCard";
+import IntensitySlider from "../../components/IntensitySlider";
 
 export default function EmotionPickerScreen() {
   const router = useRouter();
@@ -18,12 +18,14 @@ export default function EmotionPickerScreen() {
   useFocusEffect(
     useCallback(() => {
       setEditMode(false);
-    }, [])
+    }, []),
   );
   const [selectedEmotion, setSelectedEmotion] = useState<EmotionType | null>(
-    todayRecord?.emotion ?? null
+    todayRecord?.emotion ?? null,
   );
-  const [intensity, setIntensity] = useState<number>(todayRecord?.intensity ?? 5);
+  const [intensity, setIntensity] = useState<number>(
+    todayRecord?.intensity ?? 5,
+  );
 
   const isReadOnly = !!todayRecord && !editMode;
   const emotions = Object.keys(EMOTION_CONFIG) as EmotionType[];
@@ -47,10 +49,20 @@ export default function EmotionPickerScreen() {
   if (isReadOnly && todayRecord) {
     const config = EMOTION_CONFIG[todayRecord.emotion];
     return (
-      <View flex={1} backgroundColor="$background" paddingTop={60} paddingHorizontal="$space.lg">
+      <View
+        flex={1}
+        backgroundColor="$background"
+        paddingTop={60}
+        paddingHorizontal="$space.lg"
+      >
         <YStack gap="$space.lg" alignItems="center">
           <XStack alignItems="center" gap={10}>
-            <View width={3} height={22} backgroundColor="$primary" borderRadius={2} />
+            <View
+              width={3}
+              height={22}
+              backgroundColor="$primary"
+              borderRadius={2}
+            />
             <Text fontFamily="$heading" fontSize={22} color="$color">
               Ya registraste tu emoción hoy
             </Text>
@@ -86,7 +98,7 @@ export default function EmotionPickerScreen() {
                 fontSize={14}
                 numberOfLines={3}
               >
-                "{todayRecord.reflection}"
+                &ldquo;{todayRecord.reflection}&rdquo;
               </Text>
             ) : null}
           </View>
@@ -114,13 +126,22 @@ export default function EmotionPickerScreen() {
   return (
     <View flex={1} backgroundColor="$background">
       <ScrollView
-        contentContainerStyle={{ paddingTop: 60, paddingHorizontal: 16, paddingBottom: 120 }}
+        contentContainerStyle={{
+          paddingTop: 60,
+          paddingHorizontal: 16,
+          paddingBottom: 120,
+        }}
         showsVerticalScrollIndicator={false}
       >
         <YStack gap="$space.lg">
           <YStack gap="$space.xs">
             <XStack alignItems="center" gap={10}>
-              <View width={3} height={26} backgroundColor="$primary" borderRadius={2} />
+              <View
+                width={3}
+                height={26}
+                backgroundColor="$primary"
+                borderRadius={2}
+              />
               <Text fontFamily="$heading" fontSize={24} color="$color">
                 {editMode ? "Editar emoción" : "¿Cómo te sientes hoy?"}
               </Text>
@@ -131,7 +152,11 @@ export default function EmotionPickerScreen() {
           </YStack>
 
           {/* Emotion grid */}
-          <XStack flexWrap="wrap" gap="$space.sm" justifyContent="space-between">
+          <XStack
+            flexWrap="wrap"
+            gap="$space.sm"
+            justifyContent="space-between"
+          >
             {emotions.map((emotion) => (
               <EmotionCard
                 key={emotion}
@@ -147,7 +172,12 @@ export default function EmotionPickerScreen() {
           {selectedEmotion && (
             <YStack gap="$space.sm">
               <XStack alignItems="center" gap={10}>
-                <View width={3} height={18} backgroundColor={accentColor} borderRadius={2} />
+                <View
+                  width={3}
+                  height={18}
+                  backgroundColor={accentColor}
+                  borderRadius={2}
+                />
                 <Text fontFamily="$heading" fontSize={16} color="$color">
                   Intensidad
                 </Text>

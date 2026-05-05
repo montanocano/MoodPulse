@@ -1,7 +1,15 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
-// @ts-ignore — getReactNativePersistence exists at runtime; Firebase 12 types don't list it yet
-import { initializeAuth, getAuth, getReactNativePersistence } from "firebase/auth";
-import { initializeFirestore, getFirestore, memoryLocalCache } from "firebase/firestore";
+import {
+  initializeAuth,
+  getAuth,
+  // @ts-ignore — getReactNativePersistence exists at runtime; Firebase 12 types don't export it
+  getReactNativePersistence,
+} from "firebase/auth";
+import {
+  initializeFirestore,
+  getFirestore,
+  memoryLocalCache,
+} from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const firebaseConfig = {
@@ -20,7 +28,9 @@ const isNewApp = getApps().length === 0;
 const app = isNewApp ? initializeApp(firebaseConfig) : getApp();
 
 export const auth = isNewApp
-  ? initializeAuth(app, { persistence: getReactNativePersistence(AsyncStorage) })
+  ? initializeAuth(app, {
+      persistence: getReactNativePersistence(AsyncStorage),
+    })
   : getAuth(app);
 
 // memoryLocalCache: evita que el SDK intente usar IndexedDB (no disponible en RN)

@@ -1,8 +1,17 @@
 import { useState } from "react";
-import { Button, Input, Label, Spinner, Text, View, YStack, XStack } from "tamagui";
+import {
+  Button,
+  Input,
+  Label,
+  Spinner,
+  Text,
+  View,
+  YStack,
+  XStack,
+} from "tamagui";
 import { useRouter } from "expo-router";
 import { ScrollView } from "react-native";
-import { useAuthStore } from "../../stores/useAuthStore";
+import { useAuthStore } from "../../../../features/auth/store/authStore";
 import { PasswordInput } from "../../components/PasswordInput";
 
 function validateEmail(email: string) {
@@ -35,7 +44,8 @@ export default function RegisterScreen() {
     else if (password.length < 8)
       errors.password = "La contraseña debe tener al menos 8 caracteres";
     if (!confirm) errors.confirm = "Confirma tu contraseña";
-    else if (confirm !== password) errors.confirm = "Las contraseñas no coinciden";
+    else if (confirm !== password)
+      errors.confirm = "Las contraseñas no coinciden";
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
   }
@@ -56,7 +66,13 @@ export default function RegisterScreen() {
         paddingHorizontal="$space.lg"
         alignItems="center"
       >
-        <Text fontFamily="$heading" fontSize={38} color="white" fontWeight="700" letterSpacing={-1}>
+        <Text
+          fontFamily="$heading"
+          fontSize={38}
+          color="white"
+          fontWeight="700"
+          letterSpacing={-1}
+        >
           MoodPulse
         </Text>
         <Text color="white" opacity={0.8} marginTop={6} fontSize={14}>
@@ -80,13 +96,16 @@ export default function RegisterScreen() {
           <YStack gap="$space.md">
             {/* Nombre */}
             <YStack gap="$space.xs">
-              <Label color="$color" htmlFor="nombre">Nombre</Label>
+              <Label color="$color" htmlFor="nombre">
+                Nombre
+              </Label>
               <Input
                 id="nombre"
                 value={nombre}
                 onChangeText={(t) => {
                   setNombre(t);
-                  if (fieldErrors.nombre) setFieldErrors((p) => ({ ...p, nombre: undefined }));
+                  if (fieldErrors.nombre)
+                    setFieldErrors((p) => ({ ...p, nombre: undefined }));
                 }}
                 placeholder="Tu nombre"
                 autoCapitalize="words"
@@ -96,19 +115,24 @@ export default function RegisterScreen() {
                 placeholderTextColor="$placeholderColor"
               />
               {fieldErrors.nombre && (
-                <Text color="$error" fontSize={14}>{fieldErrors.nombre}</Text>
+                <Text color="$error" fontSize={14}>
+                  {fieldErrors.nombre}
+                </Text>
               )}
             </YStack>
 
             {/* Email */}
             <YStack gap="$space.xs">
-              <Label color="$color" htmlFor="email">Correo electrónico</Label>
+              <Label color="$color" htmlFor="email">
+                Correo electrónico
+              </Label>
               <Input
                 id="email"
                 value={email}
                 onChangeText={(t) => {
                   setEmail(t);
-                  if (fieldErrors.email) setFieldErrors((p) => ({ ...p, email: undefined }));
+                  if (fieldErrors.email)
+                    setFieldErrors((p) => ({ ...p, email: undefined }));
                 }}
                 placeholder="correo@ejemplo.com"
                 keyboardType="email-address"
@@ -120,47 +144,61 @@ export default function RegisterScreen() {
                 placeholderTextColor="$placeholderColor"
               />
               {fieldErrors.email && (
-                <Text color="$error" fontSize={14}>{fieldErrors.email}</Text>
+                <Text color="$error" fontSize={14}>
+                  {fieldErrors.email}
+                </Text>
               )}
             </YStack>
 
             {/* Password */}
             <YStack gap="$space.xs">
-              <Label color="$color" htmlFor="password">Contraseña</Label>
+              <Label color="$color" htmlFor="password">
+                Contraseña
+              </Label>
               <PasswordInput
                 value={password}
                 onChangeText={(t) => {
                   setPassword(t);
-                  if (fieldErrors.password) setFieldErrors((p) => ({ ...p, password: undefined }));
+                  if (fieldErrors.password)
+                    setFieldErrors((p) => ({ ...p, password: undefined }));
                 }}
                 placeholder="Contraseña (mín. 8 caracteres)"
                 borderColor={fieldErrors.password ? "#E74C3C" : undefined}
               />
               {fieldErrors.password && (
-                <Text color="$error" fontSize={14}>{fieldErrors.password}</Text>
+                <Text color="$error" fontSize={14}>
+                  {fieldErrors.password}
+                </Text>
               )}
             </YStack>
 
             {/* Confirm password */}
             <YStack gap="$space.xs">
-              <Label color="$color" htmlFor="confirm">Confirmar contraseña</Label>
+              <Label color="$color" htmlFor="confirm">
+                Confirmar contraseña
+              </Label>
               <PasswordInput
                 value={confirm}
                 onChangeText={(t) => {
                   setConfirm(t);
-                  if (fieldErrors.confirm) setFieldErrors((p) => ({ ...p, confirm: undefined }));
+                  if (fieldErrors.confirm)
+                    setFieldErrors((p) => ({ ...p, confirm: undefined }));
                 }}
                 placeholder="Confirmar contraseña"
                 borderColor={fieldErrors.confirm ? "#E74C3C" : undefined}
               />
               {fieldErrors.confirm && (
-                <Text color="$error" fontSize={14}>{fieldErrors.confirm}</Text>
+                <Text color="$error" fontSize={14}>
+                  {fieldErrors.confirm}
+                </Text>
               )}
             </YStack>
 
             {/* Store-level error */}
             {error && (
-              <Text color="$error" fontSize={14} textAlign="center">{error}</Text>
+              <Text color="$error" fontSize={14} textAlign="center">
+                {error}
+              </Text>
             )}
 
             {/* Submit */}
@@ -179,9 +217,20 @@ export default function RegisterScreen() {
           </YStack>
 
           {/* Back to login */}
-          <XStack alignItems="center" justifyContent="center" marginTop="$space.xl" gap="$space.xs">
-            <Text color="$color" opacity={0.6}>¿Ya tienes cuenta?</Text>
-            <Text color="$primary" fontWeight="600" onPress={() => router.back()}>
+          <XStack
+            alignItems="center"
+            justifyContent="center"
+            marginTop="$space.xl"
+            gap="$space.xs"
+          >
+            <Text color="$color" opacity={0.6}>
+              ¿Ya tienes cuenta?
+            </Text>
+            <Text
+              color="$primary"
+              fontWeight="600"
+              onPress={() => router.back()}
+            >
               Inicia sesión
             </Text>
           </XStack>

@@ -30,8 +30,16 @@ class DefaultAuthRepository implements IAuthRepository {
     return user;
   }
 
-  async register(email: string, password: string, nombre: string): Promise<User> {
-    const { user } = await createUserWithEmailAndPassword(auth, email, password);
+  async register(
+    email: string,
+    password: string,
+    nombre: string,
+  ): Promise<User> {
+    const { user } = await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password,
+    );
     await updateProfile(user, { displayName: nombre });
     await sendEmailVerification(user);
     await setDoc(doc(db, "users", user.uid), {
@@ -62,7 +70,7 @@ class DefaultAuthRepository implements IAuthRepository {
         rachaActual: 0,
         totalRegistros: 0,
       },
-      { merge: true }
+      { merge: true },
     );
     return user;
   }

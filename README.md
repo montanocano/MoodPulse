@@ -17,16 +17,16 @@ Copia `.env.example` a `.env` y rellena los valores:
 cp .env.example .env
 ```
 
-| Variable | Descripción |
-|---|---|
-| `EXPO_PUBLIC_FIREBASE_API_KEY` | Clave de API del proyecto Firebase |
-| `EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN` | Dominio de Auth de Firebase |
-| `EXPO_PUBLIC_FIREBASE_PROJECT_ID` | ID del proyecto Firebase |
-| `EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET` | Bucket de Storage Firebase |
-| `EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` | Sender ID de Firebase Messaging |
-| `EXPO_PUBLIC_FIREBASE_APP_ID` | App ID de Firebase |
-| `EXPO_PUBLIC_GOOGLE_CLIENT_ID` | Client ID de Google OAuth |
-| `EXPO_PUBLIC_GEMINI_API_KEY` | Clave de API de Gemini 1.5 Flash (Google AI Studio) |
+| Variable                                   | Descripción                                         |
+| ------------------------------------------ | --------------------------------------------------- |
+| `EXPO_PUBLIC_FIREBASE_API_KEY`             | Clave de API del proyecto Firebase                  |
+| `EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN`         | Dominio de Auth de Firebase                         |
+| `EXPO_PUBLIC_FIREBASE_PROJECT_ID`          | ID del proyecto Firebase                            |
+| `EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET`      | Bucket de Storage Firebase                          |
+| `EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` | Sender ID de Firebase Messaging                     |
+| `EXPO_PUBLIC_FIREBASE_APP_ID`              | App ID de Firebase                                  |
+| `EXPO_PUBLIC_GOOGLE_CLIENT_ID`             | Client ID de Google OAuth                           |
+| `EXPO_PUBLIC_GEMINI_API_KEY`               | Clave de API de Gemini 1.5 Flash (Google AI Studio) |
 
 ## Inicio rápido
 

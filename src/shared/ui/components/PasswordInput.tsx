@@ -5,7 +5,11 @@ interface PasswordInputProps extends Omit<TextInputProps, "secureTextEntry"> {
   borderColor?: string;
 }
 
-export function PasswordInput({ borderColor, style, ...props }: PasswordInputProps) {
+export function PasswordInput({
+  borderColor,
+  style,
+  ...props
+}: PasswordInputProps) {
   const theme = useTheme();
 
   return (

@@ -24,7 +24,7 @@ const STATIC_FALLBACKS: Record<EmotionType, string> = {
 
 export async function generateReflection(
   emotion: EmotionType,
-  intensity: number
+  intensity: number,
 ): Promise<string> {
   const apiKey = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
 
@@ -56,7 +56,12 @@ Devuelve únicamente el texto de la reflexión, sin introducciones ni explicacio
 
     const data = await response.json();
     const candidate = data?.candidates?.[0];
-    console.log("[Gemini] finishReason:", candidate?.finishReason, "| chars:", candidate?.content?.parts?.[0]?.text?.length);
+    console.log(
+      "[Gemini] finishReason:",
+      candidate?.finishReason,
+      "| chars:",
+      candidate?.content?.parts?.[0]?.text?.length,
+    );
     const text: string | undefined = candidate?.content?.parts?.[0]?.text;
 
     return text?.trim() || STATIC_FALLBACKS[emotion];

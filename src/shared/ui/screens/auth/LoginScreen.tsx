@@ -12,7 +12,7 @@ import {
 import { useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
-import { useAuthStore } from "../../stores/useAuthStore";
+import { useAuthStore } from "../../../../features/auth/store/authStore";
 import { PasswordInput } from "../../components/PasswordInput";
 
 WebBrowser.maybeCompleteAuthSession();
@@ -23,7 +23,8 @@ function validateEmail(email: string) {
 
 export default function LoginScreen() {
   const router = useRouter();
-  const { signIn, signInWithGoogle, loading, error, clearError } = useAuthStore();
+  const { signIn, signInWithGoogle, loading, error, clearError } =
+    useAuthStore();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -32,7 +33,7 @@ export default function LoginScreen() {
     password?: string;
   }>({});
 
-  const [_request, response, promptAsync] = Google.useAuthRequest({
+  const [, response, promptAsync] = Google.useAuthRequest({
     clientId: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID ?? "",
   });
 
@@ -43,7 +44,7 @@ export default function LoginScreen() {
         signInWithGoogle(idToken);
       }
     }
-  }, [response]);
+  }, [response, signInWithGoogle]);
 
   function validate() {
     const errors: { email?: string; password?: string } = {};
@@ -75,7 +76,13 @@ export default function LoginScreen() {
         paddingHorizontal="$space.lg"
         alignItems="center"
       >
-        <Text fontFamily="$heading" fontSize={38} color="white" fontWeight="700" letterSpacing={-1}>
+        <Text
+          fontFamily="$heading"
+          fontSize={38}
+          color="white"
+          fontWeight="700"
+          letterSpacing={-1}
+        >
           MoodPulse
         </Text>
         <Text color="white" opacity={0.8} marginTop={6} fontSize={14}>
@@ -104,7 +111,8 @@ export default function LoginScreen() {
               value={email}
               onChangeText={(t) => {
                 setEmail(t);
-                if (fieldErrors.email) setFieldErrors((p) => ({ ...p, email: undefined }));
+                if (fieldErrors.email)
+                  setFieldErrors((p) => ({ ...p, email: undefined }));
               }}
               placeholder="correo@ejemplo.com"
               keyboardType="email-address"

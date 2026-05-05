@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button, Input, Label, Spinner, Text, View, YStack } from "tamagui";
 import { useRouter } from "expo-router";
-import { useAuthStore } from "../../stores/useAuthStore";
+import { useAuthStore } from "../../../../features/auth/store/authStore";
 
 function validateEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -36,14 +36,25 @@ export default function ForgotPasswordScreen() {
 
   if (submitted) {
     return (
-      <View flex={1} backgroundColor="$background" justifyContent="center" alignItems="center" paddingHorizontal="$space.lg">
+      <View
+        flex={1}
+        backgroundColor="$background"
+        justifyContent="center"
+        alignItems="center"
+        paddingHorizontal="$space.lg"
+      >
         <YStack alignItems="center" gap="$space.lg" maxWidth={400}>
-          <Text fontFamily="$heading" fontSize={28} color="$primary" textAlign="center">
+          <Text
+            fontFamily="$heading"
+            fontSize={28}
+            color="$primary"
+            textAlign="center"
+          >
             Correo enviado
           </Text>
           <Text color="$color" opacity={0.7} textAlign="center" fontSize={16}>
-            Si el correo está registrado, recibirás un enlace para restablecer tu
-            contraseña en breve. Revisa también la carpeta de spam.
+            Si el correo está registrado, recibirás un enlace para restablecer
+            tu contraseña en breve. Revisa también la carpeta de spam.
           </Text>
           <Button
             onPress={() => router.back()}
@@ -51,7 +62,9 @@ export default function ForgotPasswordScreen() {
             borderRadius={9999}
             width="100%"
           >
-            <Text color="white" fontWeight="600">Volver al login</Text>
+            <Text color="white" fontWeight="600">
+              Volver al login
+            </Text>
           </Button>
         </YStack>
       </View>
@@ -67,7 +80,12 @@ export default function ForgotPasswordScreen() {
         paddingBottom={48}
         paddingHorizontal="$space.lg"
       >
-        <Text fontFamily="$heading" fontSize={26} color="white" fontWeight="700">
+        <Text
+          fontFamily="$heading"
+          fontSize={26}
+          color="white"
+          fontWeight="700"
+        >
           Recuperar contraseña
         </Text>
         <Text color="white" opacity={0.8} marginTop={6} fontSize={14}>
@@ -87,7 +105,9 @@ export default function ForgotPasswordScreen() {
       >
         <YStack gap="$space.md">
           <YStack gap="$space.xs">
-            <Label color="$color" htmlFor="email">Correo electrónico</Label>
+            <Label color="$color" htmlFor="email">
+              Correo electrónico
+            </Label>
             <Input
               id="email"
               value={email}
@@ -105,7 +125,9 @@ export default function ForgotPasswordScreen() {
               placeholderTextColor="$placeholderColor"
             />
             {emailError && (
-              <Text color="$error" fontSize={14}>{emailError}</Text>
+              <Text color="$error" fontSize={14}>
+                {emailError}
+              </Text>
             )}
           </YStack>
 

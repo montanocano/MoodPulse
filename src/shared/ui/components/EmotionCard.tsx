@@ -9,7 +9,12 @@ interface EmotionCardProps {
   onPress: (emotion: EmotionType) => void;
 }
 
-export default function EmotionCard({ emotion, selected, anySelected, onPress }: EmotionCardProps) {
+export default function EmotionCard({
+  emotion,
+  selected,
+  anySelected,
+  onPress,
+}: EmotionCardProps) {
   const config = EMOTION_CONFIG[emotion];
 
   return (

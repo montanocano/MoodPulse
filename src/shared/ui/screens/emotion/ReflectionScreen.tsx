@@ -1,19 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { ScrollView, Keyboard, Animated } from "react-native";
-import { useFocusEffect } from "expo-router";
-import {
-  Button,
-  Text,
-  View,
-  YStack,
-  TextArea,
-  Spinner,
-  XStack,
-} from "tamagui";
-import { useRouter, useLocalSearchParams } from "expo-router";
+import { useFocusEffect, useRouter, useLocalSearchParams } from "expo-router";
+import { Button, Text, View, YStack, TextArea, Spinner } from "tamagui";
 import { EmotionType, EMOTION_CONFIG } from "../../../../types/emotion";
-import { useEmotionStore } from "../../stores/useEmotionStore";
-import { useAuthStore } from "../../stores/useAuthStore";
+import { useEmotionStore } from "../../../../features/emotion/store/emotionStore";
+import { useAuthStore } from "../../../../features/auth/store/authStore";
 import { generateReflection } from "../../../api/geminiService";
 
 export default function ReflectionScreen() {
@@ -35,21 +26,25 @@ export default function ReflectionScreen() {
     useEmotionStore();
 
   const [reflection, setReflection] = useState(
-    isEdit ? (todayRecord?.reflection ?? "") : ""
+    isEdit ? (todayRecord?.reflection ?? "") : "",
   );
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
-  // Reset state each time this screen comes into focus (it stays mounted as a tab)
+  // Reset state each time this screen comes into focus (it stays mounted as a tab).
+  // todayRecord?.reflection is intentionally excluded from deps: including it would
+  // cause useFocusEffect to re-fire when the optimistic update changes todayRecord
+  // right after pressing Save — which resets `saved` back to false and cancels navigation.
   useFocusEffect(
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useCallback(() => {
       setSaved(false);
       setAiError(null);
       fadeAnim.setValue(0);
       setReflection(isEdit ? (todayRecord?.reflection ?? "") : "");
-    }, [isEdit, todayRecord?.reflection])
+    }, [isEdit]),
   );
 
   // Navigate to history tab after the success animation plays
@@ -65,7 +60,7 @@ export default function ReflectionScreen() {
       }, 1400);
       return () => clearTimeout(timer);
     }
-  }, [saved]);
+  }, [saved, fadeAnim, router]);
 
   async function handleGenerateAI() {
     Keyboard.dismiss();
@@ -75,7 +70,9 @@ export default function ReflectionScreen() {
       const suggestion = await generateReflection(emotion, intensity);
       setReflection(suggestion);
     } catch {
-      setAiError("No se pudo conectar con la IA. Se ha insertado una reflexión de ayuda.");
+      setAiError(
+        "No se pudo conectar con la IA. Se ha insertado una reflexión de ayuda.",
+      );
     } finally {
       setAiLoading(false);
     }
@@ -90,7 +87,11 @@ export default function ReflectionScreen() {
     // waiting for server ack while the connection is unstable, leaving the
     // spinner stuck forever. The write runs in the background and retries.
     if (isEdit && todayRecord?.date) {
-      void updateRecord(uid, todayRecord.date, { emotion, intensity, reflection });
+      void updateRecord(uid, todayRecord.date, {
+        emotion,
+        intensity,
+        reflection,
+      });
     } else {
       void saveRecord(uid, { emotion, intensity, reflection });
     }
@@ -118,7 +119,12 @@ export default function ReflectionScreen() {
         >
           <YStack alignItems="center" gap="$space.md">
             <Text fontSize={64}>✅</Text>
-            <Text fontFamily="$heading" fontSize={22} color="$color" textAlign="center">
+            <Text
+              fontFamily="$heading"
+              fontSize={22}
+              color="$color"
+              textAlign="center"
+            >
               ¡Registro guardado!
             </Text>
             <Text color="$color" opacity={0.5} fontSize={14}>
@@ -129,7 +135,11 @@ export default function ReflectionScreen() {
       )}
 
       <ScrollView
-        contentContainerStyle={{ paddingTop: 60, paddingHorizontal: 16, paddingBottom: 140 }}
+        contentContainerStyle={{
+          paddingTop: 60,
+          paddingHorizontal: 16,
+          paddingBottom: 140,
+        }}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
@@ -233,7 +243,12 @@ function XStackHeader({
   const config = EMOTION_CONFIG[emotion];
   return (
     <View flexDirection="row" alignItems="center" gap={8}>
-      <View width={3} height={36} backgroundColor={config.colorValue} borderRadius={2} />
+      <View
+        width={3}
+        height={36}
+        backgroundColor={config.colorValue}
+        borderRadius={2}
+      />
       <Text fontSize={32}>{config.emoji}</Text>
       <View flex={1}>
         <Text fontFamily="$heading" fontSize={20} color="$color">

@@ -2,15 +2,17 @@ import { useEffect } from "react";
 import { Tabs } from "expo-router";
 import { useTheme } from "tamagui";
 import { Ionicons } from "@expo/vector-icons";
-import { useAuthStore } from "../../src/shared/ui/stores/useAuthStore";
-import { useEmotionStore } from "../../src/shared/ui/stores/useEmotionStore";
+import { useAuthStore } from "../../src/features/auth/store/authStore";
+import { useEmotionStore } from "../../src/features/emotion/store/emotionStore";
 
 type IoniconsName = React.ComponentProps<typeof Ionicons>["name"];
 
 function tabIcon(active: IoniconsName, inactive: IoniconsName) {
-  return ({ color, focused }: { color: string; focused: boolean }) => (
+  const Icon = ({ color, focused }: { color: string; focused: boolean }) => (
     <Ionicons name={focused ? active : inactive} size={22} color={color} />
   );
+  Icon.displayName = "TabBarIcon";
+  return Icon;
 }
 
 export default function AppLayout() {
@@ -22,7 +24,7 @@ export default function AppLayout() {
     if (user?.uid) {
       loadRecords(user.uid);
     }
-  }, [user?.uid]);
+  }, [user?.uid, loadRecords]);
 
   return (
     <Tabs
@@ -33,7 +35,8 @@ export default function AppLayout() {
           borderTopColor: theme.borderColor?.val as string,
         },
         tabBarActiveTintColor: theme.primary?.val as string,
-        tabBarInactiveTintColor: (theme.placeholderColor?.val as string) ?? "#999",
+        tabBarInactiveTintColor:
+          (theme.placeholderColor?.val as string) ?? "#999",
       }}
     >
       <Tabs.Screen
@@ -65,10 +68,7 @@ export default function AppLayout() {
         }}
       />
       {/* reflection is a stack route, not a tab — hide from tab bar */}
-      <Tabs.Screen
-        name="reflection"
-        options={{ href: null }}
-      />
+      <Tabs.Screen name="reflection" options={{ href: null }} />
     </Tabs>
   );
 }

@@ -17,7 +17,10 @@ export interface EmotionRecord {
   updatedAt: unknown | null;
 }
 
-export type NewEmotionRecord = Omit<EmotionRecord, "createdAt" | "updatedAt" | "date">;
+export type NewEmotionRecord = Omit<
+  EmotionRecord,
+  "createdAt" | "updatedAt" | "date"
+>;
 
 interface EmotionMeta {
   label: string;
@@ -33,35 +36,40 @@ export const EMOTION_CONFIG: Record<EmotionType, EmotionMeta> = {
     emoji: "😊",
     colorToken: "$emotionHappy",
     colorValue: "#FFD700",
-    placeholder: "¿Qué te ha hecho sentir tan bien hoy? Describe ese momento especial...",
+    placeholder:
+      "¿Qué te ha hecho sentir tan bien hoy? Describe ese momento especial...",
   },
   triste: {
     label: "Triste",
     emoji: "😢",
     colorToken: "$emotionSad",
     colorValue: "#4A90D9",
-    placeholder: "¿Qué ha pasado hoy? Exprésate con total libertad, aquí estás seguro...",
+    placeholder:
+      "¿Qué ha pasado hoy? Exprésate con total libertad, aquí estás seguro...",
   },
   ansioso: {
     label: "Ansioso",
     emoji: "😰",
     colorToken: "$emotionAnxious",
     colorValue: "#FF6B6B",
-    placeholder: "¿Qué pensamientos o situaciones te generan inquietud ahora mismo?...",
+    placeholder:
+      "¿Qué pensamientos o situaciones te generan inquietud ahora mismo?...",
   },
   enfadado: {
     label: "Enfadado",
     emoji: "😠",
     colorToken: "$emotionAngry",
     colorValue: "#E74C3C",
-    placeholder: "¿Qué ha desencadenado este enfado? Describe la situación con detalle...",
+    placeholder:
+      "¿Qué ha desencadenado este enfado? Describe la situación con detalle...",
   },
   neutral: {
     label: "Neutral",
     emoji: "😐",
     colorToken: "$emotionNeutral",
     colorValue: "#95A5A6",
-    placeholder: "¿Cómo ha sido tu día? Cuéntanos sin filtros lo que ha ocurrido...",
+    placeholder:
+      "¿Cómo ha sido tu día? Cuéntanos sin filtros lo que ha ocurrido...",
   },
   agradecido: {
     label: "Agradecido",
@@ -75,7 +83,8 @@ export const EMOTION_CONFIG: Record<EmotionType, EmotionMeta> = {
     emoji: "😴",
     colorToken: "$emotionTired",
     colorValue: "#8E44AD",
-    placeholder: "¿Qué te ha agotado más hoy? Descríbelo para entender mejor tus límites...",
+    placeholder:
+      "¿Qué te ha agotado más hoy? Descríbelo para entender mejor tus límites...",
   },
   motivado: {
     label: "Motivado",
