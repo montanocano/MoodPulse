@@ -1,8 +1,17 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Alert } from "react-native";
+import { getDocs, collection } from "firebase/firestore";
+import { db } from "../../../shared/api/firebase";
 import { emotionRepository } from "../repositories/DefaultEmotionRepository";
 import { EmotionRecord, NewEmotionRecord } from "../../../types/emotion";
+import {
+  checkAchievements,
+  type AchievementType,
+  ACHIEVEMENT_CONFIG,
+} from "../../../shared/utils/checkAchievements";
+import { grantAchievements } from "../../achievements/repositories/DefaultAchievementRepository";
 
 function todayISO(): string {
   return new Date().toISOString().slice(0, 10);
@@ -86,6 +95,31 @@ export const useEmotionStore = create<EmotionState & EmotionActions>()(
         try {
           await emotionRepository.saveRecord(uid, date, data);
           set((s) => ({ ...s, loading: false }));
+
+          // Check and grant achievements after save
+          try {
+            const allRecords = useEmotionStore.getState().records;
+            const existingSnap = await getDocs(
+              collection(db, "users", uid, "achievements"),
+            );
+            const existingTypes = existingSnap.docs.map(
+              (d) => d.id as AchievementType,
+            );
+            const newTypes = checkAchievements({
+              records: allRecords,
+              completedRecommendations: 0,
+              existingTypes,
+            });
+            if (newTypes.length > 0) {
+              await grantAchievements(uid, newTypes);
+              for (const t of newTypes) {
+                const meta = ACHIEVEMENT_CONFIG[t];
+                Alert.alert("🏆 Nuevo logro", meta.titulo);
+              }
+            }
+          } catch {
+            // Achievement errors should not fail the main save
+          }
         } catch (err: unknown) {
           set((s) => ({
             ...s,

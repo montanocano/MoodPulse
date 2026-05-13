@@ -10,6 +10,7 @@ import {
   getFirestore,
   memoryLocalCache,
 } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const firebaseConfig = {
@@ -41,5 +42,18 @@ export const db = isNewApp
       experimentalForceLongPolling: true,
     })
   : getFirestore(app);
+
+// REQUIRED Firestore security rule for achievements (read by friends):
+// match /users/{uid}/achievements/{aid} {
+//   allow read: if request.auth != null;
+//   allow write: if request.auth != null && request.auth.uid == uid;
+// }
+export const storage = getStorage(app);
+
+if (!process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET) {
+  console.warn(
+    "[firebase] EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET is not set — profile photo uploads will fail.",
+  );
+}
 
 export default app;

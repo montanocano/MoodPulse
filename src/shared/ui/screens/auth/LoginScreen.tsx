@@ -1,21 +1,9 @@
-import { useState, useEffect } from "react";
-import {
-  Button,
-  Input,
-  Label,
-  Spinner,
-  Text,
-  View,
-  YStack,
-  XStack,
-} from "tamagui";
+import { useState } from "react";
+import { ScrollView } from "react-native";
+import { Button, Input, Spinner, Text, View, YStack, XStack } from "tamagui";
 import { useRouter } from "expo-router";
-import * as WebBrowser from "expo-web-browser";
-import * as Google from "expo-auth-session/providers/google";
 import { useAuthStore } from "../../../../features/auth/store/authStore";
 import { PasswordInput } from "../../components/PasswordInput";
-
-WebBrowser.maybeCompleteAuthSession();
 
 function validateEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -23,8 +11,7 @@ function validateEmail(email: string) {
 
 export default function LoginScreen() {
   const router = useRouter();
-  const { signIn, signInWithGoogle, loading, error, clearError } =
-    useAuthStore();
+  const { signIn, loading, error, clearError } = useAuthStore();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -32,19 +19,6 @@ export default function LoginScreen() {
     email?: string;
     password?: string;
   }>({});
-
-  const [, response, promptAsync] = Google.useAuthRequest({
-    clientId: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID ?? "",
-  });
-
-  useEffect(() => {
-    if (response?.type === "success") {
-      const idToken = response.params.id_token;
-      if (idToken) {
-        signInWithGoogle(idToken);
-      }
-    }
-  }, [response, signInWithGoogle]);
 
   function validate() {
     const errors: { email?: string; password?: string } = {};
@@ -61,80 +35,81 @@ export default function LoginScreen() {
     await signIn(email.trim(), password);
   }
 
-  async function handleGoogleSignIn() {
-    clearError();
-    await promptAsync();
-  }
-
   return (
     <View flex={1} backgroundColor="$background">
-      {/* Branded top band */}
-      <View
-        backgroundColor="$primary"
-        paddingTop={70}
-        paddingBottom={48}
-        paddingHorizontal="$space.lg"
-        alignItems="center"
+      <ScrollView
+        contentContainerStyle={{
+          flexGrow: 1,
+          justifyContent: "center",
+          paddingHorizontal: 32,
+          paddingVertical: 48,
+        }}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
       >
-        <Text
-          fontFamily="$heading"
-          fontSize={38}
-          color="white"
-          fontWeight="700"
-          letterSpacing={-1}
-        >
-          MoodPulse
-        </Text>
-        <Text color="white" opacity={0.8} marginTop={6} fontSize={14}>
-          Tu diario emocional inteligente
-        </Text>
-      </View>
+        <YStack alignItems="center" gap={28}>
+          {/* Title */}
+          <Text
+            fontFamily="$heading"
+            fontSize={34}
+            color="$color"
+            fontWeight="700"
+            letterSpacing={-0.5}
+          >
+            Bienvenido
+          </Text>
 
-      {/* Form card overlapping the band */}
-      <View
-        flex={1}
-        backgroundColor="$background"
-        borderTopLeftRadius={28}
-        borderTopRightRadius={28}
-        marginTop={-20}
-        paddingHorizontal="$space.lg"
-        paddingTop="$space.xl"
-      >
-        <YStack gap="$space.md">
-          {/* Email */}
-          <YStack gap="$space.xs">
-            <Label color="$color" htmlFor="email">
-              Correo electrónico
-            </Label>
+          {/* Logo */}
+          <View
+            backgroundColor="$primary"
+            width={90}
+            height={90}
+            borderRadius={20}
+            alignItems="center"
+            justifyContent="center"
+            shadowColor="$shadowColor"
+            shadowOffset={{ width: 0, height: 4 }}
+            shadowOpacity={0.18}
+            shadowRadius={8}
+            style={{ elevation: 6 }}
+          >
+            <Text
+              color="white"
+              fontFamily="$heading"
+              fontSize={26}
+              fontWeight="700"
+            >
+              M.p
+            </Text>
+          </View>
+
+          {/* Form */}
+          <YStack gap={12} width="100%">
+            {/* Email */}
             <Input
-              id="email"
               value={email}
               onChangeText={(t) => {
                 setEmail(t);
                 if (fieldErrors.email)
                   setFieldErrors((p) => ({ ...p, email: undefined }));
               }}
-              placeholder="correo@ejemplo.com"
+              placeholder="Email"
               keyboardType="email-address"
               autoCapitalize="none"
               autoCorrect={false}
-              backgroundColor="$input"
+              backgroundColor="$surface"
               borderRadius="$md"
               borderColor={fieldErrors.email ? "$error" : "$borderColor"}
               placeholderTextColor="$placeholderColor"
+              height={48}
             />
             {fieldErrors.email && (
-              <Text color="$error" fontSize={14}>
+              <Text color="$error" fontSize={12} marginTop={-6}>
                 {fieldErrors.email}
               </Text>
             )}
-          </YStack>
 
-          {/* Password */}
-          <YStack gap="$space.xs">
-            <Label color="$color" htmlFor="password">
-              Contraseña
-            </Label>
+            {/* Password */}
             <PasswordInput
               value={password}
               onChangeText={(t) => {
@@ -143,74 +118,64 @@ export default function LoginScreen() {
                   setFieldErrors((p) => ({ ...p, password: undefined }));
               }}
               placeholder="Contraseña"
-              borderColor={fieldErrors.password ? "#E74C3C" : undefined}
+              borderColor={fieldErrors.password ? "$error" : undefined}
             />
             {fieldErrors.password && (
-              <Text color="$error" fontSize={14}>
+              <Text color="$error" fontSize={12} marginTop={-6}>
                 {fieldErrors.password}
               </Text>
             )}
+
+            {/* Store-level error */}
+            {error && (
+              <Text color="$error" fontSize={13} textAlign="center">
+                {error}
+              </Text>
+            )}
+
+            {/* Sign in button */}
+            <Button
+              onPress={handleSignIn}
+              disabled={loading}
+              backgroundColor="$primary"
+              borderRadius={9999}
+              height={48}
+              marginTop={4}
+              // @ts-expect-error color is valid via ButtonContext but absent from outer prop types
+              color="white"
+              fontWeight="700"
+              fontSize={15}
+            >
+              {loading ? <Spinner color="$white" /> : "Iniciar Sesión"}
+            </Button>
           </YStack>
 
-          {/* Store-level error */}
-          {error && (
-            <Text color="$error" fontSize={14} textAlign="center">
-              {error}
-            </Text>
-          )}
-
-          {/* Sign In button */}
-          <Button
-            onPress={handleSignIn}
-            disabled={loading}
-            backgroundColor="$primary"
-            borderRadius={9999}
-            marginTop="$space.sm"
-            icon={loading ? <Spinner color="white" /> : undefined}
-          >
-            <Text color="white" fontWeight="600">
-              {loading ? "" : "Iniciar sesión"}
-            </Text>
-          </Button>
-
-          {/* Google Sign-In */}
-          <Button
-            onPress={handleGoogleSignIn}
-            disabled={loading}
-            backgroundColor="$surface"
-            borderRadius={9999}
-            borderWidth={1}
-            borderColor="$borderColor"
-          >
-            <Text color="$color" fontWeight="600">
-              Continuar con Google
-            </Text>
-          </Button>
-        </YStack>
-
-        {/* Navigation links */}
-        <YStack alignItems="center" marginTop="$space.xl" gap="$space.md">
-          <XStack gap="$space.xs">
-            <Text color="$color" opacity={0.6}>
-              ¿No tienes cuenta?
-            </Text>
+          {/* Navigation links */}
+          <YStack alignItems="center" gap={12}>
             <Text
               color="$primary"
               fontWeight="600"
-              onPress={() => router.push("/(auth)/register")}
+              fontSize={14}
+              onPress={() => router.push("/(auth)/forgot-password")}
             >
-              Regístrate
+              ¿Olvidaste tu contraseña?
             </Text>
-          </XStack>
-
-          <Text
-            color="$primary"
-            onPress={() => router.push("/(auth)/forgot-password")}
-          >
-            ¿Olvidaste tu contraseña?
-          </Text>
+            <XStack gap={6}>
+              <Text color="$color" opacity={0.6} fontSize={14}>
+                ¿No tienes cuenta?
+              </Text>
+              <Text
+                color="$primary"
+                fontWeight="700"
+                fontSize={14}
+                onPress={() => router.push("/(auth)/register")}
+              >
+                Regístrate
+              </Text>
+            </XStack>
+          </YStack>
         </YStack>
-      </View>
+      </ScrollView>
     </View>
   );
 }

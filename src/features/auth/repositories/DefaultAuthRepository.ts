@@ -4,12 +4,11 @@ import {
   signOut as firebaseSignOut,
   sendPasswordResetEmail,
   sendEmailVerification,
-  GoogleAuthProvider,
-  signInWithCredential,
   updateProfile,
+  reload,
   type User,
 } from "firebase/auth";
-import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { doc, setDoc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { auth, db } from "../../../shared/api/firebase";
 
 // ── Contract ────────────────────────────────────────────────────────────────
@@ -18,8 +17,10 @@ export interface IAuthRepository {
   signIn(email: string, password: string): Promise<User>;
   register(email: string, password: string, nombre: string): Promise<User>;
   signOut(): Promise<void>;
-  signInWithGoogle(idToken: string): Promise<User>;
   sendPasswordReset(email: string): Promise<void>;
+  checkEmailVerified(): Promise<void>;
+  resendVerificationEmail(): Promise<void>;
+  updateDisplayName(nombre: string): Promise<void>;
 }
 
 // ── Firebase implementation ─────────────────────────────────────────────────
@@ -43,7 +44,7 @@ class DefaultAuthRepository implements IAuthRepository {
     await updateProfile(user, { displayName: nombre });
     await sendEmailVerification(user);
     await setDoc(doc(db, "users", user.uid), {
-      email,
+      email: user.email ?? email.toLowerCase(),
       nombre,
       fotoUrl: null,
       fechaRegistro: serverTimestamp(),
@@ -57,30 +58,34 @@ class DefaultAuthRepository implements IAuthRepository {
     await firebaseSignOut(auth);
   }
 
-  async signInWithGoogle(idToken: string): Promise<User> {
-    const credential = GoogleAuthProvider.credential(idToken);
-    const { user } = await signInWithCredential(auth, credential);
-    await setDoc(
-      doc(db, "users", user.uid),
-      {
-        email: user.email ?? "",
-        nombre: user.displayName ?? "",
-        fotoUrl: null,
-        fechaRegistro: serverTimestamp(),
-        rachaActual: 0,
-        totalRegistros: 0,
-      },
-      { merge: true },
-    );
-    return user;
-  }
-
   async sendPasswordReset(email: string): Promise<void> {
     try {
       await sendPasswordResetEmail(auth, email);
     } catch {
       // Intentionally swallowed — anti-enumeration: always show success
     }
+  }
+
+  async checkEmailVerified(): Promise<void> {
+    const user = auth.currentUser;
+    if (!user) return;
+    await reload(user);
+    if (user.emailVerified) {
+      await user.getIdToken(true); // force token refresh → triggers onIdTokenChanged in layout
+    }
+  }
+
+  async resendVerificationEmail(): Promise<void> {
+    const user = auth.currentUser;
+    if (!user) return;
+    await sendEmailVerification(user);
+  }
+
+  async updateDisplayName(nombre: string): Promise<void> {
+    const user = auth.currentUser;
+    if (!user) return;
+    await updateProfile(user, { displayName: nombre });
+    await updateDoc(doc(db, "users", user.uid), { nombre });
   }
 }
 

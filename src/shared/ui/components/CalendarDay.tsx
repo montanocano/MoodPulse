@@ -1,7 +1,7 @@
 import { TouchableOpacity } from "react-native";
 import { Text, View, useTheme } from "tamagui";
 import { EmotionRecord, EMOTION_CONFIG } from "../../../types/emotion";
-import { parseISODate } from "../../../features/history/helpers/calendarHelpers";
+import { parseISODate } from "../../utils/calendarHelpers";
 
 interface CalendarDayProps {
   date: string | null;
@@ -66,7 +66,7 @@ export function CalendarDay({
         width={DOT_SIZE}
         height={DOT_SIZE}
         borderRadius="$full"
-        backgroundColor="#E0E0E0"
+        backgroundColor="$muted"
         opacity={0.4}
         borderWidth={isToday ? 2 : 0}
         borderColor={isToday ? (theme.primary?.val as string) : undefined}

@@ -4,6 +4,8 @@ import { useTheme } from "tamagui";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuthStore } from "../../src/features/auth/store/authStore";
 import { useEmotionStore } from "../../src/features/emotion/store/emotionStore";
+import { registerAndGetPushToken } from "../../src/shared/utils/notificationHelper";
+import { savePushToken } from "../../src/features/social/repositories/DefaultSocialRepository";
 
 type IoniconsName = React.ComponentProps<typeof Ionicons>["name"];
 
@@ -25,6 +27,14 @@ export default function AppLayout() {
       loadRecords(user.uid);
     }
   }, [user?.uid, loadRecords]);
+
+  useEffect(() => {
+    if (!user?.uid) return;
+    const uid = user.uid;
+    registerAndGetPushToken().then((token) => {
+      if (token) savePushToken(uid, token).catch(() => {});
+    });
+  }, [user?.uid]);
 
   return (
     <Tabs
@@ -61,14 +71,22 @@ export default function AppLayout() {
         }}
       />
       <Tabs.Screen
+        name="social"
+        options={{
+          title: "Social",
+          tabBarIcon: tabIcon("people", "people-outline"),
+        }}
+      />
+      <Tabs.Screen
         name="profile"
         options={{
           title: "Perfil",
           tabBarIcon: tabIcon("person", "person-outline"),
         }}
       />
-      {/* reflection is a stack route, not a tab — hide from tab bar */}
+      {/* reflection and delete-account are stack routes, not tabs — hide from tab bar */}
       <Tabs.Screen name="reflection" options={{ href: null }} />
+      <Tabs.Screen name="delete-account" options={{ href: null }} />
     </Tabs>
   );
 }

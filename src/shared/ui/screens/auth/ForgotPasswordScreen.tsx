@@ -137,11 +137,11 @@ export default function ForgotPasswordScreen() {
             backgroundColor="$primary"
             borderRadius={9999}
             marginTop="$space.sm"
-            icon={loading ? <Spinner color="white" /> : undefined}
+            // @ts-expect-error color is valid via ButtonContext but absent from outer prop types
+            color="white"
+            fontWeight="600"
           >
-            <Text color="white" fontWeight="600">
-              {loading ? "" : "Enviar enlace"}
-            </Text>
+            {loading ? <Spinner color="$white" /> : "Enviar enlace"}
           </Button>
 
           <Text

@@ -1,5 +1,5 @@
 import { View, Text, XStack } from "tamagui";
-import { DistributionEntry } from "../../../features/history/helpers/statsCalculator";
+import { DistributionEntry } from "../../utils/statsCalculator";
 import { EMOTION_CONFIG } from "../../../types/emotion";
 
 interface EmotionDistributionBarProps {
@@ -23,7 +23,7 @@ export function EmotionDistributionBar({ entry }: EmotionDistributionBarProps) {
       <View
         flex={1}
         height={10}
-        backgroundColor="#E0E0E0"
+        backgroundColor="$muted"
         borderRadius="$full"
         overflow="hidden"
       >

@@ -3,9 +3,11 @@ import { Slot, useRouter, useSegments } from "expo-router";
 import { TamaguiProvider } from "tamagui";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
-import { onAuthStateChanged } from "firebase/auth";
+import { onIdTokenChanged } from "firebase/auth";
 import { auth } from "../src/shared/api/firebase";
 import { useAuthStore } from "../src/features/auth/store/authStore";
+import { useSettingsStore } from "../src/features/settings/store/settingsStore";
+import { useSocialStore } from "../src/features/social/store/socialStore";
 import tamaguiConfig, {
   fontAssets,
 } from "../src/shared/ui/theme/tamagui.config";
@@ -45,16 +47,19 @@ function AuthGuard({ authReady }: { authReady: boolean }) {
 
 export default function RootLayout() {
   const setUser = useAuthStore((s) => s.setUser);
+  const resetSocial = useSocialStore((s) => s.reset);
+  const theme = useSettingsStore((s) => s.theme);
   const [authReady, setAuthReady] = useState(false);
   const [fontsLoaded] = useFonts(fontAssets);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+    const unsubscribe = onIdTokenChanged(auth, (firebaseUser) => {
+      if (!firebaseUser) resetSocial();
       setUser(firebaseUser);
       setAuthReady(true);
     });
     return unsubscribe;
-  }, [setUser]);
+  }, [setUser, resetSocial]);
 
   useEffect(() => {
     if (fontsLoaded && authReady) {
@@ -67,7 +72,7 @@ export default function RootLayout() {
   }
 
   return (
-    <TamaguiProvider config={tamaguiConfig} defaultTheme="light">
+    <TamaguiProvider config={tamaguiConfig} defaultTheme={theme}>
       <AuthGuard authReady={authReady} />
     </TamaguiProvider>
   );

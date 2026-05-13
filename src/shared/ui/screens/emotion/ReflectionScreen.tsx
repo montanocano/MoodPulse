@@ -38,12 +38,12 @@ export default function ReflectionScreen() {
   // cause useFocusEffect to re-fire when the optimistic update changes todayRecord
   // right after pressing Save — which resets `saved` back to false and cancels navigation.
   useFocusEffect(
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     useCallback(() => {
       setSaved(false);
       setAiError(null);
       fadeAnim.setValue(0);
       setReflection(isEdit ? (todayRecord?.reflection ?? "") : "");
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isEdit]),
   );
 
@@ -223,7 +223,7 @@ export default function ReflectionScreen() {
           borderRadius={9999}
           size="$lg"
         >
-          <Text color="white" fontWeight="600" fontSize={16}>
+          <Text color="$white" fontWeight="600" fontSize={16}>
             {isEdit ? "Actualizar" : "Guardar"}
           </Text>
         </Button>

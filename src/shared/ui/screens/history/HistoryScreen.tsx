@@ -6,10 +6,7 @@ import { CalendarDay } from "../../components/CalendarDay";
 import { WeeklyTrendChart } from "../../components/WeeklyTrendChart";
 import { EmotionDistributionBar } from "../../components/EmotionDistributionBar";
 import { EMOTION_CONFIG } from "../../../../types/emotion";
-import {
-  dayLabels,
-  todayISO,
-} from "../../../../features/history/helpers/calendarHelpers";
+import { dayLabels, todayISO } from "../../../utils/calendarHelpers";
 import { formatShortDate } from "../../../utils/formatters";
 
 export default function HistoryScreen() {

@@ -1,6 +1,6 @@
 // ── Statistics calculator — all pure functions, no side-effects ──────────────
 
-import { EmotionRecord, EmotionType } from "../../../types/emotion";
+import { EmotionRecord, EmotionType } from "../../types/emotion";
 import { todayISO } from "./calendarHelpers";
 
 // ── Types ────────────────────────────────────────────────────────────────────

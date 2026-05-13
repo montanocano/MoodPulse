@@ -1,4 +1,4 @@
-import { createTamagui, createTokens } from "@tamagui/core";
+import { createTamagui } from "@tamagui/core";
 import {
   Inter_400Regular,
   Inter_600SemiBold,
@@ -8,101 +8,7 @@ import {
   Poppins_600SemiBold,
   Poppins_700Bold,
 } from "@expo-google-fonts/poppins";
-
-const tokens = createTokens({
-  color: {
-    // Brand
-    primary: "#6C5CE7",
-    secondary: "#A29BFE",
-
-    // Emotion palette
-    emotionHappy: "#FFD700",
-    emotionSad: "#4A90D9",
-    emotionAnxious: "#FF6B6B",
-    emotionAngry: "#E74C3C",
-    emotionNeutral: "#95A5A6",
-    emotionGrateful: "#2ECC71",
-    emotionTired: "#8E44AD",
-    emotionMotivated: "#F39C12",
-
-    // Semantic – light defaults (overridden by themes)
-    backgroundLight: "#FAFAFA",
-    backgroundDark: "#1A1A2E",
-    surfaceLight: "#FFFFFF",
-    surfaceDark: "#16213E",
-    textLight: "#1A1A2E",
-    textDark: "#FAFAFA",
-
-    // Error / neutral
-    error: "#E74C3C",
-    white: "#FFFFFF",
-    black: "#000000",
-    transparent: "transparent",
-  },
-
-  space: {
-    xs: 4,
-    sm: 8,
-    md: 16,
-    lg: 24,
-    xl: 32,
-    xxl: 48,
-    // Required size tokens
-    0: 0,
-    1: 4,
-    2: 8,
-    3: 12,
-    4: 16,
-    5: 20,
-    6: 24,
-    8: 32,
-    10: 40,
-    12: 48,
-    true: 16,
-  },
-
-  size: {
-    xs: 28,
-    sm: 36,
-    md: 44,
-    lg: 52,
-    xl: 60,
-    0: 0,
-    1: 4,
-    2: 8,
-    3: 12,
-    4: 16,
-    5: 20,
-    6: 24,
-    8: 32,
-    10: 40,
-    12: 48,
-    true: 44,
-  },
-
-  radius: {
-    sm: 8,
-    md: 12,
-    lg: 16,
-    xl: 24,
-    full: 9999,
-    0: 0,
-    1: 4,
-    2: 8,
-    3: 12,
-    4: 16,
-    true: 12,
-  },
-
-  zIndex: {
-    0: 0,
-    1: 100,
-    2: 200,
-    3: 300,
-    4: 400,
-    5: 500,
-  },
-});
+import { tokens } from "../tokens";
 
 const lightTheme = {
   background: tokens.color.backgroundLight,
@@ -116,45 +22,45 @@ const lightTheme = {
   colorPress: "#111111",
   colorFocus: "#333333",
   colorTransparent: "transparent",
-  borderColor: "#E0E0E0",
-  borderColorHover: "#CCCCCC",
+  borderColor: "#D8D0B0",
+  borderColorHover: "#C8BFA0",
   borderColorFocus: tokens.color.primary,
-  borderColorPress: "#BBBBBB",
-  placeholderColor: "#9E9E9E",
+  borderColorPress: "#B8AF90",
+  placeholderColor: "#9A9470",
   outlineColor: tokens.color.primary,
   primary: tokens.color.primary,
   secondary: tokens.color.secondary,
   surface: tokens.color.surfaceLight,
-  shadowColor: "rgba(0,0,0,0.1)",
+  shadowColor: "rgba(0,0,0,0.12)",
   // Shadcn-style semantic
   card: tokens.color.surfaceLight,
-  input: "#F5F5F5",
+  input: "#EDE8D0",
 };
 
 const darkTheme = {
   background: tokens.color.backgroundDark,
-  backgroundHover: "#1E1E3E",
-  backgroundPress: "#252545",
-  backgroundFocus: "#1E1E3E",
+  backgroundHover: "#222810",
+  backgroundPress: "#2A3014",
+  backgroundFocus: "#222810",
   backgroundStrong: tokens.color.surfaceDark,
   backgroundTransparent: "transparent",
   color: tokens.color.textDark,
-  colorHover: "#E0E0E0",
-  colorPress: "#FFFFFF",
-  colorFocus: "#E0E0E0",
+  colorHover: "#E8EDD0",
+  colorPress: "#FEFEF5",
+  colorFocus: "#E8EDD0",
   colorTransparent: "transparent",
-  borderColor: "#2E2E4E",
-  borderColorHover: "#3E3E5E",
+  borderColor: "#3A4020",
+  borderColorHover: "#4A5028",
   borderColorFocus: tokens.color.secondary,
-  borderColorPress: "#4E4E6E",
-  placeholderColor: "#6E6E8E",
+  borderColorPress: "#585E34",
+  placeholderColor: "#6E7848",
   outlineColor: tokens.color.secondary,
   primary: tokens.color.secondary,
   secondary: tokens.color.primary,
   surface: tokens.color.surfaceDark,
   shadowColor: "rgba(0,0,0,0.4)",
   card: tokens.color.surfaceDark,
-  input: "#1E1E3E",
+  input: "#222810",
 };
 
 const config = createTamagui({

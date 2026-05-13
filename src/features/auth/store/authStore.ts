@@ -2,21 +2,27 @@ import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 import { type User } from "firebase/auth";
 import { authRepository } from "../repositories/DefaultAuthRepository";
+import { getAchievements } from "../../achievements";
+import type { AchievementMeta } from "../../../shared/utils/checkAchievements";
 
 interface AuthState {
   user: User | null;
   loading: boolean;
   error: string | null;
+  achievements: AchievementMeta[];
 }
 
 interface AuthActions {
   register: (email: string, password: string, nombre: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
-  signInWithGoogle: (idToken: string) => Promise<void>;
   sendPasswordReset: (email: string) => Promise<void>;
   signOut: () => Promise<void>;
   setUser: (user: User | null) => void;
   clearError: () => void;
+  checkEmailVerified: () => Promise<void>;
+  resendVerificationEmail: () => Promise<void>;
+  updateDisplayName: (nombre: string) => Promise<void>;
+  loadAchievements: (uid: string) => Promise<void>;
 }
 
 function parseFirebaseError(code: string): string {
@@ -38,6 +44,7 @@ export const useAuthStore = create<AuthState & AuthActions>()(
     user: null,
     loading: false,
     error: null,
+    achievements: [],
 
     // ── Register ────────────────────────────────────────────────────
     register: async (email, password, nombre) => {
@@ -68,27 +75,6 @@ export const useAuthStore = create<AuthState & AuthActions>()(
       });
       try {
         const user = await authRepository.signIn(email, password);
-        set((state) => {
-          state.user = user;
-          state.loading = false;
-        });
-      } catch (err: unknown) {
-        const code = (err as { code?: string }).code ?? "";
-        set((state) => {
-          state.error = parseFirebaseError(code);
-          state.loading = false;
-        });
-      }
-    },
-
-    // ── Google Sign In ──────────────────────────────────────────────
-    signInWithGoogle: async (idToken: string) => {
-      set((state) => {
-        state.loading = true;
-        state.error = null;
-      });
-      try {
-        const user = await authRepository.signInWithGoogle(idToken);
         set((state) => {
           state.user = user;
           state.loading = false;
@@ -150,6 +136,41 @@ export const useAuthStore = create<AuthState & AuthActions>()(
       set((state) => {
         state.error = null;
       });
+    },
+
+    // ── Email verification ──────────────────────────────────────────
+    checkEmailVerified: async () => {
+      await authRepository.checkEmailVerified();
+    },
+
+    resendVerificationEmail: async () => {
+      await authRepository.resendVerificationEmail();
+    },
+
+    // ── Profile ─────────────────────────────────────────────────────
+    updateDisplayName: async (nombre) => {
+      set((state) => {
+        state.loading = true;
+        state.error = null;
+      });
+      try {
+        await authRepository.updateDisplayName(nombre);
+      } finally {
+        set((state) => {
+          state.loading = false;
+        });
+      }
+    },
+
+    loadAchievements: async (uid) => {
+      try {
+        const items = await getAchievements(uid);
+        set((state) => {
+          state.achievements = items;
+        });
+      } catch {
+        // Non-critical — leave achievements as-is
+      }
     },
   })),
 );

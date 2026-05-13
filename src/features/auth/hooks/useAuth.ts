@@ -9,7 +9,6 @@ export interface UseAuthReturn {
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   register: (email: string, password: string, nombre: string) => Promise<void>;
-  signInWithGoogle: (idToken: string) => Promise<void>;
   sendPasswordReset: (email: string) => Promise<void>;
   clearError: () => void;
 }
@@ -28,14 +27,12 @@ export function useAuth(): UseAuthReturn {
   const _signIn = useAuthStore((s) => s.signIn);
   const _signOut = useAuthStore((s) => s.signOut);
   const _register = useAuthStore((s) => s.register);
-  const _signInWithGoogle = useAuthStore((s) => s.signInWithGoogle);
   const _sendPasswordReset = useAuthStore((s) => s.sendPasswordReset);
   const _clearError = useAuthStore((s) => s.clearError);
 
   const signIn = useCallback(_signIn, [_signIn]);
   const signOut = useCallback(_signOut, [_signOut]);
   const register = useCallback(_register, [_register]);
-  const signInWithGoogle = useCallback(_signInWithGoogle, [_signInWithGoogle]);
   const sendPasswordReset = useCallback(_sendPasswordReset, [
     _sendPasswordReset,
   ]);
@@ -48,7 +45,6 @@ export function useAuth(): UseAuthReturn {
     signIn,
     signOut,
     register,
-    signInWithGoogle,
     sendPasswordReset,
     clearError,
   };

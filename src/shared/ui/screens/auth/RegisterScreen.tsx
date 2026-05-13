@@ -1,16 +1,7 @@
 import { useState } from "react";
-import {
-  Button,
-  Input,
-  Label,
-  Spinner,
-  Text,
-  View,
-  YStack,
-  XStack,
-} from "tamagui";
-import { useRouter } from "expo-router";
 import { ScrollView } from "react-native";
+import { Button, Input, Spinner, Text, View, YStack } from "tamagui";
+import { useRouter } from "expo-router";
 import { useAuthStore } from "../../../../features/auth/store/authStore";
 import { PasswordInput } from "../../components/PasswordInput";
 
@@ -58,145 +49,137 @@ export default function RegisterScreen() {
 
   return (
     <View flex={1} backgroundColor="$background">
-      {/* Branded top band */}
-      <View
-        backgroundColor="$primary"
-        paddingTop={70}
-        paddingBottom={48}
-        paddingHorizontal="$space.lg"
-        alignItems="center"
-      >
-        <Text
-          fontFamily="$heading"
-          fontSize={38}
-          color="white"
-          fontWeight="700"
-          letterSpacing={-1}
-        >
-          MoodPulse
-        </Text>
-        <Text color="white" opacity={0.8} marginTop={6} fontSize={14}>
-          Crea tu cuenta
-        </Text>
-      </View>
-
-      {/* Form card */}
       <ScrollView
-        contentContainerStyle={{ paddingBottom: 40 }}
+        contentContainerStyle={{
+          flexGrow: 1,
+          justifyContent: "center",
+          paddingHorizontal: 32,
+          paddingVertical: 48,
+        }}
+        keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <View
-          backgroundColor="$background"
-          borderTopLeftRadius={28}
-          borderTopRightRadius={28}
-          marginTop={-20}
-          paddingHorizontal={24}
-          paddingTop={32}
-        >
-          <YStack gap="$space.md">
+        <YStack alignItems="center" gap={28}>
+          {/* Title */}
+          <Text
+            fontFamily="$heading"
+            fontSize={34}
+            color="$color"
+            fontWeight="700"
+            letterSpacing={-0.5}
+          >
+            Registro
+          </Text>
+
+          {/* Logo */}
+          <View
+            backgroundColor="$primary"
+            width={90}
+            height={90}
+            borderRadius={20}
+            alignItems="center"
+            justifyContent="center"
+            shadowColor="$shadowColor"
+            shadowOffset={{ width: 0, height: 4 }}
+            shadowOpacity={0.18}
+            shadowRadius={8}
+            style={{ elevation: 6 }}
+          >
+            <Text
+              color="white"
+              fontFamily="$heading"
+              fontSize={26}
+              fontWeight="700"
+            >
+              M.p
+            </Text>
+          </View>
+
+          {/* Form */}
+          <YStack gap={12} width="100%">
             {/* Nombre */}
-            <YStack gap="$space.xs">
-              <Label color="$color" htmlFor="nombre">
-                Nombre
-              </Label>
-              <Input
-                id="nombre"
-                value={nombre}
-                onChangeText={(t) => {
-                  setNombre(t);
-                  if (fieldErrors.nombre)
-                    setFieldErrors((p) => ({ ...p, nombre: undefined }));
-                }}
-                placeholder="Tu nombre"
-                autoCapitalize="words"
-                backgroundColor="$input"
-                borderRadius="$md"
-                borderColor={fieldErrors.nombre ? "$error" : "$borderColor"}
-                placeholderTextColor="$placeholderColor"
-              />
-              {fieldErrors.nombre && (
-                <Text color="$error" fontSize={14}>
-                  {fieldErrors.nombre}
-                </Text>
-              )}
-            </YStack>
+            <Input
+              value={nombre}
+              onChangeText={(t) => {
+                setNombre(t);
+                if (fieldErrors.nombre)
+                  setFieldErrors((p) => ({ ...p, nombre: undefined }));
+              }}
+              placeholder="Nombre"
+              autoCapitalize="words"
+              backgroundColor="$surface"
+              borderRadius="$md"
+              borderColor={fieldErrors.nombre ? "$error" : "$borderColor"}
+              placeholderTextColor="$placeholderColor"
+              height={48}
+            />
+            {fieldErrors.nombre && (
+              <Text color="$error" fontSize={12} marginTop={-6}>
+                {fieldErrors.nombre}
+              </Text>
+            )}
 
             {/* Email */}
-            <YStack gap="$space.xs">
-              <Label color="$color" htmlFor="email">
-                Correo electrónico
-              </Label>
-              <Input
-                id="email"
-                value={email}
-                onChangeText={(t) => {
-                  setEmail(t);
-                  if (fieldErrors.email)
-                    setFieldErrors((p) => ({ ...p, email: undefined }));
-                }}
-                placeholder="correo@ejemplo.com"
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-                backgroundColor="$input"
-                borderRadius="$md"
-                borderColor={fieldErrors.email ? "$error" : "$borderColor"}
-                placeholderTextColor="$placeholderColor"
-              />
-              {fieldErrors.email && (
-                <Text color="$error" fontSize={14}>
-                  {fieldErrors.email}
-                </Text>
-              )}
-            </YStack>
+            <Input
+              value={email}
+              onChangeText={(t) => {
+                setEmail(t);
+                if (fieldErrors.email)
+                  setFieldErrors((p) => ({ ...p, email: undefined }));
+              }}
+              placeholder="Email"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
+              backgroundColor="$surface"
+              borderRadius="$md"
+              borderColor={fieldErrors.email ? "$error" : "$borderColor"}
+              placeholderTextColor="$placeholderColor"
+              height={48}
+            />
+            {fieldErrors.email && (
+              <Text color="$error" fontSize={12} marginTop={-6}>
+                {fieldErrors.email}
+              </Text>
+            )}
 
-            {/* Password */}
-            <YStack gap="$space.xs">
-              <Label color="$color" htmlFor="password">
-                Contraseña
-              </Label>
-              <PasswordInput
-                value={password}
-                onChangeText={(t) => {
-                  setPassword(t);
-                  if (fieldErrors.password)
-                    setFieldErrors((p) => ({ ...p, password: undefined }));
-                }}
-                placeholder="Contraseña (mín. 8 caracteres)"
-                borderColor={fieldErrors.password ? "#E74C3C" : undefined}
-              />
-              {fieldErrors.password && (
-                <Text color="$error" fontSize={14}>
-                  {fieldErrors.password}
-                </Text>
-              )}
-            </YStack>
+            {/* Contraseña */}
+            <PasswordInput
+              value={password}
+              onChangeText={(t) => {
+                setPassword(t);
+                if (fieldErrors.password)
+                  setFieldErrors((p) => ({ ...p, password: undefined }));
+              }}
+              placeholder="Contraseña"
+              borderColor={fieldErrors.password ? "$error" : undefined}
+            />
+            {fieldErrors.password && (
+              <Text color="$error" fontSize={12} marginTop={-6}>
+                {fieldErrors.password}
+              </Text>
+            )}
 
-            {/* Confirm password */}
-            <YStack gap="$space.xs">
-              <Label color="$color" htmlFor="confirm">
-                Confirmar contraseña
-              </Label>
-              <PasswordInput
-                value={confirm}
-                onChangeText={(t) => {
-                  setConfirm(t);
-                  if (fieldErrors.confirm)
-                    setFieldErrors((p) => ({ ...p, confirm: undefined }));
-                }}
-                placeholder="Confirmar contraseña"
-                borderColor={fieldErrors.confirm ? "#E74C3C" : undefined}
-              />
-              {fieldErrors.confirm && (
-                <Text color="$error" fontSize={14}>
-                  {fieldErrors.confirm}
-                </Text>
-              )}
-            </YStack>
+            {/* Repetir contraseña */}
+            <PasswordInput
+              value={confirm}
+              onChangeText={(t) => {
+                setConfirm(t);
+                if (fieldErrors.confirm)
+                  setFieldErrors((p) => ({ ...p, confirm: undefined }));
+              }}
+              placeholder="Repetir contraseña"
+              borderColor={fieldErrors.confirm ? "$error" : undefined}
+            />
+            {fieldErrors.confirm && (
+              <Text color="$error" fontSize={12} marginTop={-6}>
+                {fieldErrors.confirm}
+              </Text>
+            )}
 
             {/* Store-level error */}
             {error && (
-              <Text color="$error" fontSize={14} textAlign="center">
+              <Text color="$error" fontSize={13} textAlign="center">
                 {error}
               </Text>
             )}
@@ -207,34 +190,27 @@ export default function RegisterScreen() {
               disabled={loading}
               backgroundColor="$primary"
               borderRadius={9999}
-              marginTop="$space.sm"
-              icon={loading ? <Spinner color="white" /> : undefined}
+              height={48}
+              marginTop={4}
+              // @ts-expect-error color is valid via ButtonContext but absent from outer prop types
+              color="white"
+              fontWeight="700"
+              fontSize={15}
             >
-              <Text color="white" fontWeight="600">
-                {loading ? "" : "Crear cuenta"}
-              </Text>
+              {loading ? <Spinner color="$white" /> : "Registrarse"}
             </Button>
           </YStack>
 
-          {/* Back to login */}
-          <XStack
-            alignItems="center"
-            justifyContent="center"
-            marginTop="$space.xl"
-            gap="$space.xs"
+          {/* Back link */}
+          <Text
+            color="$primary"
+            fontWeight="600"
+            fontSize={14}
+            onPress={() => router.back()}
           >
-            <Text color="$color" opacity={0.6}>
-              ¿Ya tienes cuenta?
-            </Text>
-            <Text
-              color="$primary"
-              fontWeight="600"
-              onPress={() => router.back()}
-            >
-              Inicia sesión
-            </Text>
-          </XStack>
-        </View>
+            Volver
+          </Text>
+        </YStack>
       </ScrollView>
     </View>
   );

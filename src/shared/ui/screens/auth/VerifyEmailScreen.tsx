@@ -1,45 +1,42 @@
 import { useEffect, useRef, useState } from "react";
 import { AppState, type AppStateStatus } from "react-native";
 import { Button, Spinner, Text, View, YStack } from "tamagui";
-import { sendEmailVerification, reload } from "firebase/auth";
-import { auth } from "../../../api/firebase";
 import { useAuthStore } from "../../../../features/auth/store/authStore";
 
 export default function VerifyEmailScreen() {
-  const { user, setUser, signOut } = useAuthStore();
+  const { user, signOut, checkEmailVerified, resendVerificationEmail } =
+    useAuthStore();
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const appState = useRef(AppState.currentState);
 
-  // Poll emailVerified when app comes back to foreground
+  // Poll every 3 s and on foreground resume — repository handles reload + token refresh
   useEffect(() => {
+    const interval = setInterval(checkEmailVerified, 3000);
+
     const subscription = AppState.addEventListener(
       "change",
-      async (nextState: AppStateStatus) => {
+      (nextState: AppStateStatus) => {
         if (
           appState.current.match(/inactive|background/) &&
           nextState === "active"
         ) {
-          const currentUser = auth.currentUser;
-          if (currentUser) {
-            await reload(currentUser);
-            if (currentUser.emailVerified) {
-              setUser(currentUser);
-            }
-          }
+          void checkEmailVerified();
         }
         appState.current = nextState;
       },
     );
-    return () => subscription.remove();
-  }, [setUser]);
+
+    return () => {
+      clearInterval(interval);
+      subscription.remove();
+    };
+  }, [checkEmailVerified]);
 
   async function handleResend() {
-    const currentUser = auth.currentUser;
-    if (!currentUser) return;
     setSending(true);
     try {
-      await sendEmailVerification(currentUser);
+      await resendVerificationEmail();
       setSent(true);
     } finally {
       setSending(false);
@@ -89,11 +86,11 @@ export default function VerifyEmailScreen() {
           backgroundColor="$primary"
           borderRadius={9999}
           width="100%"
-          icon={sending ? <Spinner color="white" /> : undefined}
+          // @ts-expect-error color is valid via ButtonContext but absent from outer prop types
+          color="$white"
+          fontWeight="600"
         >
-          <Text color="white" fontWeight="600">
-            {sending ? "" : "Reenviar correo"}
-          </Text>
+          {sending ? <Spinner color="$white" /> : "Reenviar correo"}
         </Button>
 
         <Text

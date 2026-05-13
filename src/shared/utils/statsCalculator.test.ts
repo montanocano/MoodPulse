@@ -4,7 +4,7 @@ import {
   weeklyTrend,
   emotionDistribution,
 } from "./statsCalculator";
-import { EmotionRecord } from "../../../types/emotion";
+import { EmotionRecord } from "../../types/emotion";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 

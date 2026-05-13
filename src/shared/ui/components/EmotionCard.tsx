@@ -21,18 +21,16 @@ export default function EmotionCard({
     <Pressable
       onPress={() => onPress(emotion)}
       style={({ pressed }) => ({
-        width: "46%",
-        aspectRatio: 1,
-        opacity: pressed ? 0.85 : anySelected && !selected ? 0.6 : 1,
-        transform: [{ scale: selected ? 1.05 : 1 }],
+        width: "23%",
+        aspectRatio: 0.85,
+        opacity: pressed ? 0.8 : anySelected && !selected ? 0.55 : 1,
+        transform: [{ scale: selected ? 1.06 : 1 }],
       })}
     >
       <View
         flex={1}
-        backgroundColor={config.colorValue + (selected ? "28" : "18")}
-        borderWidth={selected ? 2 : 1}
-        borderColor={selected ? config.colorValue : config.colorValue + "44"}
-        borderRadius={20}
+        backgroundColor={config.colorValue}
+        borderRadius={14}
         alignItems="center"
         justifyContent="center"
         style={
@@ -40,20 +38,27 @@ export default function EmotionCard({
             ? {
                 shadowColor: config.colorValue,
                 shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.35,
+                shadowOpacity: 0.45,
                 shadowRadius: 8,
-                elevation: 6,
+                elevation: 8,
               }
-            : undefined
+            : {
+                shadowColor: "$black",
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.1,
+                shadowRadius: 4,
+                elevation: 3,
+              }
         }
       >
-        <YStack alignItems="center" gap={6}>
-          <Text fontSize={40}>{config.emoji}</Text>
+        <YStack alignItems="center" gap={4} paddingVertical={10}>
+          <Text fontSize={28}>{config.emoji}</Text>
           <Text
-            fontSize={13}
-            fontWeight={selected ? "700" : "500"}
-            color={selected ? config.colorValue : "$color"}
+            fontSize={11}
+            fontWeight="600"
+            color="$white"
             textAlign="center"
+            numberOfLines={1}
           >
             {config.label}
           </Text>

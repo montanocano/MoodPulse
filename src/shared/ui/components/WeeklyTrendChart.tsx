@@ -1,7 +1,8 @@
 import { View, Text, XStack, YStack } from "tamagui";
-import { WeeklyTrendEntry } from "../../../features/history/helpers/statsCalculator";
+import { WeeklyTrendEntry } from "../../utils/statsCalculator";
 import { EMOTION_CONFIG } from "../../../types/emotion";
-import { dayLabels } from "../../../features/history/helpers/calendarHelpers";
+import { dayLabels } from "../../utils/calendarHelpers";
+import { tokens } from "../tokens";
 
 interface WeeklyTrendChartProps {
   entries: WeeklyTrendEntry[];
@@ -9,7 +10,7 @@ interface WeeklyTrendChartProps {
 
 const MAX_BAR_HEIGHT = 72;
 const BAR_WIDTH = 28;
-const EMPTY_COLOR = "#E0E0E0";
+const EMPTY_COLOR = tokens.color.muted.val;
 
 export function WeeklyTrendChart({ entries }: WeeklyTrendChartProps) {
   return (

@@ -6,7 +6,7 @@ import {
   buildMonthGrid,
   monthLabel,
   todayISO,
-} from "../helpers/calendarHelpers";
+} from "../../../shared/utils/calendarHelpers";
 import {
   dominantEmotion,
   currentStreak,
@@ -14,7 +14,7 @@ import {
   emotionDistribution,
   WeeklyTrendEntry,
   DistributionEntry,
-} from "../helpers/statsCalculator";
+} from "../../../shared/utils/statsCalculator";
 
 export interface HistoryViewModel {
   // ── Calendar ──────────────────────────────────────────────────────────────

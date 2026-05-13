@@ -1,5 +1,7 @@
-import { TextInput, type TextInputProps } from "react-native";
+import { useState } from "react";
+import { TextInput, TouchableOpacity, type TextInputProps } from "react-native";
 import { useTheme, View } from "tamagui";
+import { Ionicons } from "@expo/vector-icons";
 
 interface PasswordInputProps extends Omit<TextInputProps, "secureTextEntry"> {
   borderColor?: string;
@@ -11,6 +13,7 @@ export function PasswordInput({
   ...props
 }: PasswordInputProps) {
   const theme = useTheme();
+  const [visible, setVisible] = useState(false);
 
   return (
     <View
@@ -20,10 +23,11 @@ export function PasswordInput({
       backgroundColor="$input"
       paddingHorizontal="$space.md"
       height={44}
-      justifyContent="center"
+      flexDirection="row"
+      alignItems="center"
     >
       <TextInput
-        secureTextEntry
+        secureTextEntry={!visible}
         placeholderTextColor={theme.placeholderColor?.val as string}
         style={[
           {
@@ -35,6 +39,13 @@ export function PasswordInput({
         ]}
         {...props}
       />
+      <TouchableOpacity onPress={() => setVisible((v) => !v)} hitSlop={8}>
+        <Ionicons
+          name={visible ? "eye-off-outline" : "eye-outline"}
+          size={20}
+          color={theme.placeholderColor?.val as string}
+        />
+      </TouchableOpacity>
     </View>
   );
 }

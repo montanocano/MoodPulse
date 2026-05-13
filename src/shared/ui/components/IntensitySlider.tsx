@@ -1,5 +1,6 @@
 import { View, Text, XStack, YStack } from "tamagui";
 import { Pressable, useWindowDimensions } from "react-native";
+import { tokens } from "../tokens";
 
 interface IntensitySliderProps {
   value: number;
@@ -12,18 +13,17 @@ const STEPS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 export default function IntensitySlider({
   value,
   onChange,
-  accentColor = "#6C5CE7",
+  accentColor = tokens.color.primary.val,
 }: IntensitySliderProps) {
   const { width } = useWindowDimensions();
-  // 32px de padding horizontal total, 4px de gap entre 10 ítems = 36px extra
-  const itemSize = Math.floor((width - 32 - 36) / 10);
+  const itemSize = Math.floor((width - 40 - 36) / 10);
 
   return (
     <YStack gap={12}>
-      {/* Etiquetas + valor actual */}
+      {/* Current value badge */}
       <XStack justifyContent="space-between" alignItems="center">
         <Text color="$color" opacity={0.45} fontSize={12}>
-          😌 Baja
+          Baja
         </Text>
         <View
           backgroundColor={accentColor + "22"}
@@ -38,11 +38,11 @@ export default function IntensitySlider({
           </Text>
         </View>
         <Text color="$color" opacity={0.45} fontSize={12}>
-          Alta 🔥
+          Alta
         </Text>
       </XStack>
 
-      {/* Círculos numéricos */}
+      {/* Numbered circles */}
       <XStack justifyContent="space-between">
         {STEPS.map((step) => {
           const isSelected = step === value;
