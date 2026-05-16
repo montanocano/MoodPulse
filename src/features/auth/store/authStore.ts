@@ -4,6 +4,7 @@ import { type User } from "firebase/auth";
 import { authRepository } from "../repositories/DefaultAuthRepository";
 import { getAchievements } from "../../achievements";
 import type { AchievementMeta } from "../../../shared/utils/checkAchievements";
+import { useRecommendationStore } from "../../recommendations/store/recommendationStore";
 
 interface AuthState {
   user: User | null;
@@ -111,6 +112,7 @@ export const useAuthStore = create<AuthState & AuthActions>()(
       });
       try {
         await authRepository.signOut();
+        useRecommendationStore.getState().reset();
         set((state) => {
           state.user = null;
           state.loading = false;

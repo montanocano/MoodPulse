@@ -4,6 +4,7 @@ import { useTheme } from "tamagui";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuthStore } from "../../src/features/auth/store/authStore";
 import { useEmotionStore } from "../../src/features/emotion/store/emotionStore";
+import { useRecommendationStore } from "../../src/features/recommendations/store/recommendationStore";
 import { registerAndGetPushToken } from "../../src/shared/utils/notificationHelper";
 import { savePushToken } from "../../src/features/social/repositories/DefaultSocialRepository";
 
@@ -21,12 +22,14 @@ export default function AppLayout() {
   const theme = useTheme();
   const user = useAuthStore((s) => s.user);
   const loadRecords = useEmotionStore((s) => s.loadRecords);
+  const loadRecommendations = useRecommendationStore((s) => s.loadRecommendations);
 
   useEffect(() => {
     if (user?.uid) {
       loadRecords(user.uid);
+      loadRecommendations(user.uid);
     }
-  }, [user?.uid, loadRecords]);
+  }, [user?.uid, loadRecords, loadRecommendations]);
 
   useEffect(() => {
     if (!user?.uid) return;

@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { Button, Input, Label, Spinner, Text, View, YStack } from "tamagui";
+import { Input, Label, Text, View, YStack } from "tamagui";
+import { AppButton } from "../../components/AppButton";
 import { useRouter } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuthStore } from "../../../../features/auth/store/authStore";
 
 function validateEmail(email: string) {
@@ -9,6 +11,7 @@ function validateEmail(email: string) {
 
 export default function ForgotPasswordScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { sendPasswordReset, loading } = useAuthStore();
 
   const [email, setEmail] = useState("");
@@ -42,6 +45,7 @@ export default function ForgotPasswordScreen() {
         justifyContent="center"
         alignItems="center"
         paddingHorizontal="$space.lg"
+        paddingTop={insets.top}
       >
         <YStack alignItems="center" gap="$space.lg" maxWidth={400}>
           <Text
@@ -56,16 +60,13 @@ export default function ForgotPasswordScreen() {
             Si el correo está registrado, recibirás un enlace para restablecer
             tu contraseña en breve. Revisa también la carpeta de spam.
           </Text>
-          <Button
+          <AppButton
+            label="Volver al login"
             onPress={() => router.back()}
-            backgroundColor="$primary"
-            borderRadius={9999}
-            width="100%"
-          >
-            <Text color="white" fontWeight="600">
-              Volver al login
-            </Text>
-          </Button>
+            variant="primary"
+            shape="pill"
+            fullWidth
+          />
         </YStack>
       </View>
     );
@@ -76,7 +77,7 @@ export default function ForgotPasswordScreen() {
       {/* Branded top band */}
       <View
         backgroundColor="$primary"
-        paddingTop={70}
+        paddingTop={insets.top + 20}
         paddingBottom={48}
         paddingHorizontal="$space.lg"
       >
@@ -131,18 +132,15 @@ export default function ForgotPasswordScreen() {
             )}
           </YStack>
 
-          <Button
+          <AppButton
+            label="Enviar enlace"
             onPress={handleSubmit}
             disabled={loading}
-            backgroundColor="$primary"
-            borderRadius={9999}
-            marginTop="$space.sm"
-            // @ts-expect-error color is valid via ButtonContext but absent from outer prop types
-            color="white"
-            fontWeight="600"
-          >
-            {loading ? <Spinner color="$white" /> : "Enviar enlace"}
-          </Button>
+            loading={loading}
+            variant="primary"
+            shape="pill"
+            fullWidth
+          />
 
           <Text
             color="$primary"

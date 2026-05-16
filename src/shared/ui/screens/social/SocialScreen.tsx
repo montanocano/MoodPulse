@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import { ScrollView, Alert } from "react-native";
-import { Button, Input, Text, View, YStack, XStack, useTheme } from "tamagui";
+import { Input, Text, View, YStack, XStack, useTheme } from "tamagui";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuthStore } from "../../../../features/auth/store/authStore";
 import { useSocialStore } from "../../../../features/social/store/socialStore";
 import { FriendCard } from "../../components/FriendCard";
+import { AppButton } from "../../components/AppButton";
 
 export default function SocialScreen() {
   const theme = useTheme();
+  const insets = useSafeAreaInsets();
   const user = useAuthStore((s) => s.user);
   const uid = user?.uid ?? "";
 
@@ -25,6 +28,7 @@ export default function SocialScreen() {
     acceptRequest,
     rejectRequest,
     cancelRequest,
+    removeFriend,
     clearSearch,
     clearError,
   } = useSocialStore();
@@ -67,250 +71,193 @@ export default function SocialScreen() {
     : false;
 
   return (
-    <ScrollView
-      style={{ flex: 1, backgroundColor: theme.background?.val as string }}
-      contentContainerStyle={{
-        paddingTop: 60,
-        paddingHorizontal: 20,
-        paddingBottom: 40,
-      }}
-    >
-      <YStack gap="$space.lg">
-        <Text fontFamily="$heading" fontSize={24} color="$color">
-          Social
-        </Text>
-
-        {/* ── Search ──────────────────────────────────────────────── */}
-        <YStack gap="$space.sm">
-          <Text fontSize={14} color="$color" opacity={0.6} fontWeight="600">
-            BUSCAR AMIGOS
+    <View flex={1} backgroundColor="$background" paddingTop={insets.top}>
+      <ScrollView
+        style={{ flex: 1, backgroundColor: theme.background?.val as string }}
+        contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40 }}
+      >
+        <YStack gap="$space.lg">
+          <Text fontFamily="$heading" fontSize={24} color="$color">
+            Social
           </Text>
-          <XStack gap="$space.sm">
-            <Input
-              flex={1}
-              value={searchEmail}
-              onChangeText={(t) => {
-                setSearchEmail(t);
-                clearSearch();
-              }}
-              placeholder="correo@ejemplo.com"
-              autoCapitalize="none"
-              keyboardType="email-address"
-            />
-            <Button
-              onPress={handleSearch}
-              disabled={loading || !searchEmail.trim()}
-              backgroundColor="$primary"
-              borderRadius="$md"
-              paddingHorizontal="$space.md"
-            >
-              <Text color="$white" fontWeight="600">
-                Buscar
-              </Text>
-            </Button>
-          </XStack>
 
-          {/* Search result */}
-          {searchStatus === "not_found" && (
-            <Text color="$color" opacity={0.5} fontSize={14}>
-              No se ha encontrado ningún usuario con ese correo.
+          {/* ── Search ──────────────────────────────────────────────── */}
+          <YStack gap="$space.sm">
+            <Text fontSize={14} color="$color" opacity={0.6} fontWeight="600">
+              BUSCAR AMIGOS
             </Text>
-          )}
-          {searchStatus === "self" && (
-            <Text color="$color" opacity={0.5} fontSize={14}>
-              No puedes agregarte a ti mismo/a.
-            </Text>
-          )}
-          {searchStatus === "found" && searchResult && (
-            <XStack
-              backgroundColor="$surface"
-              borderRadius="$md"
-              borderWidth={1}
-              borderColor="$borderColor"
-              padding="$space.md"
-              alignItems="center"
-              justifyContent="space-between"
-            >
-              <YStack>
-                <Text fontWeight="600" color="$color">
-                  {searchResult.nombre ??
-                    searchResult.email ??
-                    searchResult.uid}
-                </Text>
-                <Text fontSize={12} color="$color" opacity={0.5}>
-                  {searchResult.email}
-                </Text>
-              </YStack>
-              <Button
-                onPress={
-                  isAlreadyFriend
-                    ? undefined
-                    : isPendingTo
-                      ? handleCancelFromSearch
-                      : handleSendRequest
-                }
-                disabled={isAlreadyFriend || loading}
-                backgroundColor={
-                  isAlreadyFriend
-                    ? "$surface"
-                    : isPendingTo
-                      ? "$surface"
-                      : "$primary"
-                }
-                borderWidth={1}
-                borderColor={
-                  isAlreadyFriend
-                    ? "$borderColor"
-                    : isPendingTo
-                      ? "$emotionAngry"
-                      : "$primary"
-                }
-                borderRadius="$md"
-                paddingHorizontal="$space.sm"
-              >
-                <Text
-                  color={
-                    isAlreadyFriend
-                      ? "$color"
-                      : isPendingTo
-                        ? "$emotionAngry"
-                        : "$white"
-                  }
-                  fontSize={13}
-                  fontWeight="600"
-                >
-                  {isAlreadyFriend
-                    ? "Ya son amigos"
-                    : isPendingTo
-                      ? "Cancelar solicitud"
-                      : "Enviar solicitud"}
-                </Text>
-              </Button>
+            <XStack gap="$space.sm">
+              <Input
+                flex={1}
+                value={searchEmail}
+                onChangeText={(t) => {
+                  setSearchEmail(t);
+                  clearSearch();
+                }}
+                placeholder="correo@ejemplo.com"
+                autoCapitalize="none"
+                keyboardType="email-address"
+              />
+              <AppButton
+                label="Buscar"
+                onPress={handleSearch}
+                disabled={loading || !searchEmail.trim()}
+                variant="primary"
+              />
             </XStack>
-          )}
-        </YStack>
 
-        {/* ── Incoming requests ───────────────────────────────────── */}
-        {incomingRequests.length > 0 && (
-          <YStack gap="$space.sm">
-            <Text fontSize={14} color="$color" opacity={0.6} fontWeight="600">
-              SOLICITUDES RECIBIDAS ({incomingRequests.length})
-            </Text>
-            {incomingRequests.map((req) => (
-              <XStack
-                key={req.id}
-                backgroundColor="$surface"
-                borderRadius="$md"
-                borderWidth={1}
-                borderColor="$borderColor"
-                padding="$space.md"
-                alignItems="center"
-                justifyContent="space-between"
-              >
-                <Text fontWeight="600" color="$color" flex={1}>
-                  {req.fromName ?? req.fromUid}
-                </Text>
-                <XStack gap="$space.sm">
-                  <Button
-                    onPress={() => acceptRequest(req.id, uid)}
-                    disabled={loading}
-                    backgroundColor="$emotionGrateful"
-                    borderRadius="$md"
-                    paddingHorizontal="$space.sm"
-                    paddingVertical="$space.xs"
-                  >
-                    <Text color="$white" fontSize={13} fontWeight="600">
-                      Aceptar
-                    </Text>
-                  </Button>
-                  <Button
-                    onPress={() => rejectRequest(req.id, uid)}
-                    disabled={loading}
-                    backgroundColor="$surface"
-                    borderWidth={1}
-                    borderColor="$emotionAngry"
-                    borderRadius="$md"
-                    paddingHorizontal="$space.sm"
-                    paddingVertical="$space.xs"
-                  >
-                    <Text color="$emotionAngry" fontSize={13} fontWeight="600">
-                      Rechazar
-                    </Text>
-                  </Button>
-                </XStack>
-              </XStack>
-            ))}
-          </YStack>
-        )}
-
-        {/* ── Outgoing requests ───────────────────────────────────── */}
-        {outgoingRequests.length > 0 && (
-          <YStack gap="$space.sm">
-            <Text fontSize={14} color="$color" opacity={0.6} fontWeight="600">
-              SOLICITUDES ENVIADAS ({outgoingRequests.length})
-            </Text>
-            {outgoingRequests.map((req) => (
-              <XStack
-                key={req.id}
-                backgroundColor="$surface"
-                borderRadius="$md"
-                borderWidth={1}
-                borderColor="$borderColor"
-                padding="$space.md"
-                alignItems="center"
-                justifyContent="space-between"
-              >
-                <Text fontWeight="600" color="$color" flex={1}>
-                  {req.toName ?? req.toUid}
-                </Text>
-                <Button
-                  onPress={() => cancelRequest(req.id, uid)}
-                  disabled={loading}
-                  backgroundColor="$surface"
-                  borderWidth={1}
-                  borderColor="$emotionAngry"
-                  borderRadius="$md"
-                  paddingHorizontal="$space.sm"
-                  paddingVertical="$space.xs"
-                >
-                  <Text color="$emotionAngry" fontSize={13} fontWeight="600">
-                    Cancelar
-                  </Text>
-                </Button>
-              </XStack>
-            ))}
-          </YStack>
-        )}
-
-        {/* ── Friends list ─────────────────────────────────────────── */}
-        <YStack gap="$space.sm">
-          <Text fontSize={14} color="$color" opacity={0.6} fontWeight="600">
-            AMIGOS
-          </Text>
-          {friends.length === 0 ? (
-            <View
-              backgroundColor="$surface"
-              borderRadius="$md"
-              borderWidth={1}
-              borderColor="$borderColor"
-              padding="$space.lg"
-              alignItems="center"
-            >
-              <Text
-                color="$color"
-                opacity={0.5}
-                textAlign="center"
-                fontSize={14}
-              >
-                Aún no tienes amigos en MoodPulse.{"\n"}¡Busca a alguien por su
-                correo!
+            {searchStatus === "not_found" && (
+              <Text color="$color" opacity={0.5} fontSize={14}>
+                No se ha encontrado ningún usuario con ese correo.
               </Text>
-            </View>
-          ) : (
-            friends.map((f) => <FriendCard key={f.uid} friend={f} />)
+            )}
+            {searchStatus === "self" && (
+              <Text color="$color" opacity={0.5} fontSize={14}>
+                No puedes agregarte a ti mismo/a.
+              </Text>
+            )}
+            {searchStatus === "found" && searchResult && (
+              <XStack
+                backgroundColor="$surface"
+                borderRadius="$md"
+                borderWidth={1}
+                borderColor="$borderColor"
+                padding="$space.md"
+                alignItems="center"
+                justifyContent="space-between"
+              >
+                <YStack>
+                  <Text fontWeight="600" color="$color">
+                    {searchResult.nombre ?? searchResult.email ?? searchResult.uid}
+                  </Text>
+                  <Text fontSize={12} color="$color" opacity={0.5}>
+                    {searchResult.email}
+                  </Text>
+                </YStack>
+                <AppButton
+                  label={
+                    isAlreadyFriend
+                      ? "Ya son amigos"
+                      : isPendingTo
+                        ? "Cancelar solicitud"
+                        : "Enviar solicitud"
+                  }
+                  onPress={
+                    isAlreadyFriend
+                      ? undefined
+                      : isPendingTo
+                        ? handleCancelFromSearch
+                        : handleSendRequest
+                  }
+                  disabled={isAlreadyFriend || loading}
+                  variant={
+                    isAlreadyFriend ? "neutral" : isPendingTo ? "danger" : "primary"
+                  }
+                />
+              </XStack>
+            )}
+          </YStack>
+
+          {/* ── Incoming requests ───────────────────────────────────── */}
+          {incomingRequests.length > 0 && (
+            <YStack gap="$space.sm">
+              <Text fontSize={14} color="$color" opacity={0.6} fontWeight="600">
+                SOLICITUDES RECIBIDAS ({incomingRequests.length})
+              </Text>
+              {incomingRequests.map((req) => (
+                <XStack
+                  key={req.id}
+                  backgroundColor="$surface"
+                  borderRadius="$md"
+                  borderWidth={1}
+                  borderColor="$borderColor"
+                  padding="$space.md"
+                  alignItems="center"
+                  justifyContent="space-between"
+                >
+                  <Text fontWeight="600" color="$color" flex={1}>
+                    {req.fromName ?? req.fromUid}
+                  </Text>
+                  <XStack gap="$space.sm">
+                    <AppButton
+                      label="Aceptar"
+                      onPress={() => acceptRequest(req.id, uid)}
+                      disabled={loading}
+                      variant="primary"
+                    />
+                    <AppButton
+                      label="Rechazar"
+                      onPress={() => rejectRequest(req.id, uid)}
+                      disabled={loading}
+                      variant="danger"
+                    />
+                  </XStack>
+                </XStack>
+              ))}
+            </YStack>
           )}
+
+          {/* ── Outgoing requests ───────────────────────────────────── */}
+          {outgoingRequests.length > 0 && (
+            <YStack gap="$space.sm">
+              <Text fontSize={14} color="$color" opacity={0.6} fontWeight="600">
+                SOLICITUDES ENVIADAS ({outgoingRequests.length})
+              </Text>
+              {outgoingRequests.map((req) => (
+                <XStack
+                  key={req.id}
+                  backgroundColor="$surface"
+                  borderRadius="$md"
+                  borderWidth={1}
+                  borderColor="$borderColor"
+                  padding="$space.md"
+                  alignItems="center"
+                  justifyContent="space-between"
+                >
+                  <Text fontWeight="600" color="$color" flex={1}>
+                    {req.toName ?? req.toUid}
+                  </Text>
+                  <AppButton
+                    label="Cancelar"
+                    onPress={() => cancelRequest(req.id, uid)}
+                    disabled={loading}
+                    variant="danger"
+                  />
+                </XStack>
+              ))}
+            </YStack>
+          )}
+
+          {/* ── Friends list ─────────────────────────────────────────── */}
+          <YStack gap="$space.sm">
+            <Text fontSize={14} color="$color" opacity={0.6} fontWeight="600">
+              AMIGOS
+            </Text>
+            {friends.length === 0 ? (
+              <View
+                backgroundColor="$surface"
+                borderRadius="$md"
+                borderWidth={1}
+                borderColor="$borderColor"
+                padding="$space.lg"
+                alignItems="center"
+              >
+                <Text color="$color" opacity={0.5} textAlign="center" fontSize={14}>
+                  Aún no tienes amigos en MoodPulse.{"\n"}¡Busca a alguien por su correo!
+                </Text>
+              </View>
+            ) : (
+              friends.map((f) => (
+                <FriendCard
+                  key={f.uid}
+                  friend={f}
+                  onRemove={() => removeFriend(uid, f.uid)}
+                />
+              ))
+            )}
+          </YStack>
         </YStack>
-      </YStack>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }

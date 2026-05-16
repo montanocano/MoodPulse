@@ -25,6 +25,7 @@ interface SocialActions {
   rejectRequest: (requestId: string, uid: string) => Promise<void>;
   searchByEmail: (email: string, currentUid: string) => Promise<void>;
   cancelRequest: (requestId: string, uid: string) => Promise<void>;
+  removeFriend: (uid: string, friendUid: string) => Promise<void>;
   clearSearch: () => void;
   clearError: () => void;
   reset: () => void;
@@ -191,6 +192,23 @@ export const useSocialStore = create<SocialState & SocialActions>()(
         set((s) => {
           s.loading = false;
           s.error = "No se pudo cancelar la solicitud.";
+        });
+      }
+    },
+
+    removeFriend: async (uid, friendUid) => {
+      set((s) => { s.loading = true; });
+      try {
+        await repo.removeFriend(uid, friendUid);
+        const friends = await repo.getFriends(uid);
+        set((s) => {
+          s.friends = friends;
+          s.loading = false;
+        });
+      } catch {
+        set((s) => {
+          s.loading = false;
+          s.error = "No se pudo eliminar el amigo.";
         });
       }
     },

@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { Alert, TextInput } from "react-native";
-import { Button, Text, View, YStack, useTheme } from "tamagui";
+import { Text, View, YStack, useTheme } from "tamagui";
+import { AppButton } from "../../components/AppButton";
 import { useRouter } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { PasswordInput } from "../../components/PasswordInput";
 import { deleteAccount } from "../../../utils/deleteAccountHelper";
 import { useAuthStore } from "../../../../features/auth/store/authStore";
@@ -11,6 +13,7 @@ import { useSettingsStore } from "../../../../features/settings/store/settingsSt
 export default function DeleteAccountScreen() {
   const theme = useTheme();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -81,7 +84,7 @@ export default function DeleteAccountScreen() {
     <View
       flex={1}
       backgroundColor="$background"
-      paddingTop={60}
+      paddingTop={insets.top}
       paddingHorizontal="$space.lg"
     >
       <YStack gap="$space.lg">
@@ -154,33 +157,24 @@ export default function DeleteAccountScreen() {
           ) : null}
         </YStack>
 
-        <Button
+        <AppButton
+          label={loading ? "Eliminando..." : "Eliminar mi cuenta"}
           onPress={handleDelete}
           disabled={loading || !email || !password}
-          backgroundColor={email && password ? "$emotionAngry" : "$surface"}
-          borderWidth={1}
-          borderColor="$emotionAngry"
-          borderRadius="$md"
-          opacity={email && password ? 1 : 0.5}
-        >
-          <Text
-            color={email && password ? "white" : "$emotionAngry"}
-            fontWeight="600"
-          >
-            {loading ? "Eliminando..." : "Eliminar mi cuenta"}
-          </Text>
-        </Button>
+          loading={loading}
+          variant={email && password ? "danger-filled" : "danger"}
+          shape="rounded"
+          fullWidth
+        />
 
-        <Button
+        <AppButton
+          label="Cancelar"
           onPress={() => router.back()}
           disabled={loading}
-          backgroundColor="$surface"
-          borderWidth={1}
-          borderColor="$borderColor"
-          borderRadius="$md"
-        >
-          <Text color="$color">Cancelar</Text>
-        </Button>
+          variant="secondary"
+          shape="rounded"
+          fullWidth
+        />
       </YStack>
     </View>
   );

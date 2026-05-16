@@ -1,9 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { AppState, type AppStateStatus } from "react-native";
-import { Button, Spinner, Text, View, YStack } from "tamagui";
+import { Text, View, YStack } from "tamagui";
+import { AppButton } from "../../components/AppButton";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuthStore } from "../../../../features/auth/store/authStore";
 
 export default function VerifyEmailScreen() {
+  const insets = useSafeAreaInsets();
   const { user, signOut, checkEmailVerified, resendVerificationEmail } =
     useAuthStore();
   const [sending, setSending] = useState(false);
@@ -50,6 +53,7 @@ export default function VerifyEmailScreen() {
       justifyContent="center"
       alignItems="center"
       paddingHorizontal="$space.lg"
+      paddingTop={insets.top}
     >
       <YStack alignItems="center" gap="$space.lg" maxWidth={400}>
         <Text
@@ -80,18 +84,15 @@ export default function VerifyEmailScreen() {
           </Text>
         )}
 
-        <Button
+        <AppButton
+          label="Reenviar correo"
           onPress={handleResend}
           disabled={sending}
-          backgroundColor="$primary"
-          borderRadius={9999}
-          width="100%"
-          // @ts-expect-error color is valid via ButtonContext but absent from outer prop types
-          color="$white"
-          fontWeight="600"
-        >
-          {sending ? <Spinner color="$white" /> : "Reenviar correo"}
-        </Button>
+          loading={sending}
+          variant="primary"
+          shape="pill"
+          fullWidth
+        />
 
         <Text
           color="$color"

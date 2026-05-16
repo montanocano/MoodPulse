@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { ScrollView, Keyboard, Animated } from "react-native";
 import { useFocusEffect, useRouter, useLocalSearchParams } from "expo-router";
-import { Button, Text, View, YStack, TextArea, Spinner } from "tamagui";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Text, View, YStack, TextArea } from "tamagui";
+import { AppButton } from "../../components/AppButton";
 import { EmotionType, EMOTION_CONFIG } from "../../../../types/emotion";
 import { useEmotionStore } from "../../../../features/emotion/store/emotionStore";
 import { useAuthStore } from "../../../../features/auth/store/authStore";
@@ -9,6 +11,7 @@ import { generateReflection } from "../../../api/geminiService";
 
 export default function ReflectionScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const params = useLocalSearchParams<{
     emotion: EmotionType;
     intensity: string;
@@ -100,7 +103,7 @@ export default function ReflectionScreen() {
   }
 
   return (
-    <View flex={1} backgroundColor="$background">
+    <View flex={1} backgroundColor="$background" paddingTop={insets.top}>
       {/* Success overlay */}
       {saved && (
         <Animated.View
@@ -136,7 +139,6 @@ export default function ReflectionScreen() {
 
       <ScrollView
         contentContainerStyle={{
-          paddingTop: 60,
           paddingHorizontal: 16,
           paddingBottom: 140,
         }}
@@ -172,23 +174,16 @@ export default function ReflectionScreen() {
             autoFocus
           />
 
-          {/* AI button */}
-          <Button
+          <AppButton
+            label="✨ Generar reflexión con IA"
             onPress={handleGenerateAI}
             disabled={aiLoading}
-            backgroundColor={config.colorValue + "18"}
-            borderWidth={1.5}
-            borderColor={config.colorValue}
-            borderRadius={9999}
-          >
-            {aiLoading ? (
-              <Spinner size="small" color={config.colorValue} />
-            ) : (
-              <Text color={config.colorValue} fontWeight="600">
-                ✨ Generar reflexión con IA
-              </Text>
-            )}
-          </Button>
+            loading={aiLoading}
+            variant="secondary"
+            shape="pill"
+            fullWidth
+            accentColor={config.colorValue}
+          />
 
           {aiError && (
             <Text color="$error" fontSize={13} opacity={0.9}>
@@ -216,17 +211,16 @@ export default function ReflectionScreen() {
         borderTopWidth={1}
         borderTopColor="$borderColor"
       >
-        <Button
+        <AppButton
+          label={isEdit ? "Actualizar" : "Guardar"}
           onPress={handleSave}
           disabled={saved}
-          backgroundColor={config.colorValue}
-          borderRadius={9999}
-          size="$lg"
-        >
-          <Text color="$white" fontWeight="600" fontSize={16}>
-            {isEdit ? "Actualizar" : "Guardar"}
-          </Text>
-        </Button>
+          variant="primary"
+          shape="pill"
+          size="lg"
+          fullWidth
+          accentColor={config.colorValue}
+        />
       </View>
     </View>
   );

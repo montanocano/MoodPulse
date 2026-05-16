@@ -12,6 +12,7 @@ import {
   ACHIEVEMENT_CONFIG,
 } from "../../../shared/utils/checkAchievements";
 import { grantAchievements } from "../../achievements/repositories/DefaultAchievementRepository";
+import { useRecommendationStore } from "../../recommendations/store/recommendationStore";
 
 function todayISO(): string {
   return new Date().toISOString().slice(0, 10);
@@ -105,9 +106,12 @@ export const useEmotionStore = create<EmotionState & EmotionActions>()(
             const existingTypes = existingSnap.docs.map(
               (d) => d.id as AchievementType,
             );
+            const completedRecommendations = useRecommendationStore
+              .getState()
+              .recommendations.filter((r) => r.completada).length;
             const newTypes = checkAchievements({
               records: allRecords,
-              completedRecommendations: 0,
+              completedRecommendations,
               existingTypes,
             });
             if (newTypes.length > 0) {

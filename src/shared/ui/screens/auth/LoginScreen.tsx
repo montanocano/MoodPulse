@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { ScrollView } from "react-native";
-import { Button, Input, Spinner, Text, View, YStack, XStack } from "tamagui";
+import { Input, Text, View, YStack, XStack } from "tamagui";
+import { AppButton } from "../../components/AppButton";
 import { useRouter } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuthStore } from "../../../../features/auth/store/authStore";
 import { PasswordInput } from "../../components/PasswordInput";
 
@@ -11,6 +13,7 @@ function validateEmail(email: string) {
 
 export default function LoginScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { signIn, loading, error, clearError } = useAuthStore();
 
   const [email, setEmail] = useState("");
@@ -36,7 +39,7 @@ export default function LoginScreen() {
   }
 
   return (
-    <View flex={1} backgroundColor="$background">
+    <View flex={1} backgroundColor="$background" paddingTop={insets.top}>
       <ScrollView
         contentContainerStyle={{
           flexGrow: 1,
@@ -133,21 +136,16 @@ export default function LoginScreen() {
               </Text>
             )}
 
-            {/* Sign in button */}
-            <Button
+            <AppButton
+              label="Iniciar Sesión"
               onPress={handleSignIn}
               disabled={loading}
-              backgroundColor="$primary"
-              borderRadius={9999}
-              height={48}
-              marginTop={4}
-              // @ts-expect-error color is valid via ButtonContext but absent from outer prop types
-              color="white"
-              fontWeight="700"
-              fontSize={15}
-            >
-              {loading ? <Spinner color="$white" /> : "Iniciar Sesión"}
-            </Button>
+              loading={loading}
+              variant="primary"
+              shape="pill"
+              size="lg"
+              fullWidth
+            />
           </YStack>
 
           {/* Navigation links */}

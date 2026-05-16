@@ -1,7 +1,9 @@
 import { useState, useCallback } from "react";
 import { ScrollView } from "react-native";
-import { Button, Text, View, YStack, XStack } from "tamagui";
+import { Text, View, YStack, XStack } from "tamagui";
+import { AppButton } from "../../components/AppButton";
 import { useRouter, useFocusEffect } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { EmotionType, EMOTION_CONFIG } from "../../../../types/emotion";
 import { useEmotionStore } from "../../../../features/emotion/store/emotionStore";
 import EmotionCard from "../../components/EmotionCard";
@@ -10,6 +12,7 @@ import { tokens } from "../../tokens";
 
 export default function EmotionPickerScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const todayRecord = useEmotionStore((s) => s.todayRecord);
 
   const [editMode, setEditMode] = useState(false);
@@ -51,7 +54,7 @@ export default function EmotionPickerScreen() {
       <View
         flex={1}
         backgroundColor="$background"
-        paddingTop={60}
+        paddingTop={insets.top}
         paddingHorizontal={24}
       >
         <YStack gap={24} alignItems="center">
@@ -105,22 +108,18 @@ export default function EmotionPickerScreen() {
             ) : null}
           </View>
 
-          <Button
+          <AppButton
+            label="Editar registro"
             onPress={() => {
               setSelectedEmotion(todayRecord.emotion);
               setIntensity(todayRecord.intensity);
               setEditMode(true);
             }}
-            backgroundColor="$primary"
-            borderRadius={9999}
-            width="100%"
-            height={48}
-            // @ts-expect-error color is valid via ButtonContext but absent from outer prop types
-            color="$white"
-            fontWeight="700"
-          >
-            Editar registro
-          </Button>
+            variant="primary"
+            shape="pill"
+            size="lg"
+            fullWidth
+          />
         </YStack>
       </View>
     );
@@ -128,10 +127,9 @@ export default function EmotionPickerScreen() {
 
   // ── Creation / edit view ─────────────────────────────────────────
   return (
-    <View flex={1} backgroundColor="$background">
+    <View flex={1} backgroundColor="$background" paddingTop={insets.top}>
       <ScrollView
         contentContainerStyle={{
-          paddingTop: 60,
           paddingHorizontal: 20,
           paddingBottom: 120,
         }}
@@ -188,20 +186,16 @@ export default function EmotionPickerScreen() {
         borderTopWidth={1}
         borderTopColor="$borderColor"
       >
-        <Button
+        <AppButton
+          label="Siguiente"
           onPress={handleNext}
           disabled={!selectedEmotion}
-          backgroundColor="$primary"
-          borderRadius={9999}
-          height={48}
+          variant="primary"
+          shape="pill"
+          size="lg"
+          fullWidth
           opacity={selectedEmotion ? 1 : 0.4}
-          // @ts-expect-error color is valid via ButtonContext but absent from outer prop types
-          color="$white"
-          fontWeight="700"
-          fontSize={15}
-        >
-          Siguiente
-        </Button>
+        />
       </View>
     </View>
   );

@@ -1,7 +1,11 @@
+import { useCallback } from "react";
 import { TouchableOpacity } from "react-native";
 import { View, Text, XStack, YStack, ScrollView as TScrollView } from "tamagui";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useFocusEffect } from "expo-router";
 import { useHistory } from "../../../../features/history/hooks/useHistory";
+import { useEmotionStore } from "../../../../features/emotion/store/emotionStore";
+import { useAuthStore } from "../../../../features/auth/store/authStore";
 import { CalendarDay } from "../../components/CalendarDay";
 import { WeeklyTrendChart } from "../../components/WeeklyTrendChart";
 import { EmotionDistributionBar } from "../../components/EmotionDistributionBar";
@@ -11,6 +15,14 @@ import { formatShortDate } from "../../../utils/formatters";
 
 export default function HistoryScreen() {
   const insets = useSafeAreaInsets();
+  const user = useAuthStore((s) => s.user);
+  const loadRecords = useEmotionStore((s) => s.loadRecords);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (user?.uid) loadRecords(user.uid);
+    }, [user?.uid, loadRecords]),
+  );
   const {
     year,
     monthName,
@@ -31,11 +43,72 @@ export default function HistoryScreen() {
     hasEnoughRecords,
   } = useHistory();
 
+  const allRecords = useEmotionStore((s) => s.records);
   const today = todayISO();
 
   const monthHasRecords = grid
     .flat()
     .some((d) => d !== null && recordsByDate[d] !== undefined);
+
+  const monthRecords = Object.values(recordsByDate);
+  const monthAvgIntensity =
+    monthRecords.length > 0
+      ? Math.round(
+          (monthRecords.reduce((s, r) => s + r.intensity, 0) /
+            monthRecords.length) *
+            10,
+        ) / 10
+      : 0;
+  const recentMonthRecords = [...monthRecords]
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .slice(0, 3);
+
+  const globalAvgIntensity =
+    allRecords.length > 0
+      ? Math.round(
+          (allRecords.reduce((s, r) => s + r.intensity, 0) /
+            allRecords.length) *
+            10,
+        ) / 10
+      : 0;
+
+  const maxIntensity =
+    allRecords.length > 0
+      ? Math.max(...allRecords.map((r) => r.intensity))
+      : 0;
+
+  const minIntensity =
+    allRecords.length > 0
+      ? Math.min(...allRecords.map((r) => r.intensity))
+      : 0;
+
+  const reflectionsCount = allRecords.filter(
+    (r) => r.reflection && r.reflection.trim().length > 0,
+  ).length;
+
+  const bestStreakEver = (() => {
+    if (allRecords.length === 0) return 0;
+    const dates = [...new Set(allRecords.map((r) => r.date))].sort();
+    let best = 1;
+    let current = 1;
+    for (let i = 1; i < dates.length; i++) {
+      const [y1, m1, d1] = dates[i - 1].split("-").map(Number);
+      const [y2, m2, d2] = dates[i].split("-").map(Number);
+      const diff =
+        (Date.UTC(y2, m2 - 1, d2) - Date.UTC(y1, m1 - 1, d1)) / 86400000;
+      if (diff === 1) {
+        current++;
+        if (current > best) best = current;
+      } else {
+        current = 1;
+      }
+    }
+    return best;
+  })();
+
+  const recentAllRecords = [...allRecords]
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .slice(0, 5);
 
   const selectedRecord = selectedDate ? recordsByDate[selectedDate] : null;
 
@@ -43,7 +116,7 @@ export default function HistoryScreen() {
     <View flex={1} backgroundColor="$background" paddingTop={insets.top}>
       {/* ── CALENDAR VIEW ──────────────────────────────────────────────────── */}
       {!showStats && (
-        <YStack flex={1}>
+        <TScrollView flex={1} showsVerticalScrollIndicator={false}>
           {/* Month navigation header */}
           <XStack
             alignItems="center"
@@ -125,13 +198,145 @@ export default function HistoryScreen() {
             ))}
           </YStack>
 
+          {/* Monthly summary — shown when the month has records */}
+          {monthHasRecords && (
+            <YStack
+              paddingHorizontal="$space.md"
+              paddingTop="$space.lg"
+              paddingBottom="$space.xxl"
+              gap="$space.md"
+            >
+              <Text
+                fontFamily="$heading"
+                fontSize={14}
+                color="$color"
+                opacity={0.7}
+              >
+                Resumen del mes
+              </Text>
+
+              {/* Stat cards row */}
+              <XStack gap="$space.md">
+                <View
+                  flex={1}
+                  backgroundColor="$surface"
+                  borderRadius="$lg"
+                  padding="$space.md"
+                  borderWidth={1}
+                  borderColor="$borderColor"
+                >
+                  <Text fontFamily="$heading" fontSize={28} color="$primary">
+                    {monthRecords.length}
+                  </Text>
+                  <Text fontSize={12} color="$color" opacity={0.5}>
+                    días registrados
+                  </Text>
+                </View>
+
+                <View
+                  flex={1}
+                  backgroundColor="$surface"
+                  borderRadius="$lg"
+                  padding="$space.md"
+                  borderWidth={1}
+                  borderColor="$borderColor"
+                >
+                  <Text fontFamily="$heading" fontSize={28} color="$primary">
+                    {monthAvgIntensity}
+                  </Text>
+                  <Text fontSize={12} color="$color" opacity={0.5}>
+                    intensidad media
+                  </Text>
+                </View>
+
+                <View
+                  flex={1}
+                  backgroundColor="$surface"
+                  borderRadius="$lg"
+                  padding="$space.md"
+                  borderWidth={1}
+                  borderColor="$borderColor"
+                >
+                  <Text fontFamily="$heading" fontSize={28} color="$primary">
+                    {streak}
+                  </Text>
+                  <Text fontSize={12} color="$color" opacity={0.5}>
+                    racha actual
+                  </Text>
+                </View>
+              </XStack>
+
+              {/* Recent entries */}
+              <Text
+                fontFamily="$heading"
+                fontSize={14}
+                color="$color"
+                opacity={0.7}
+                marginTop="$space.xs"
+              >
+                Últimos registros
+              </Text>
+              <YStack gap="$space.sm">
+                {recentMonthRecords.map((record) => {
+                  const cfg = EMOTION_CONFIG[record.emotion];
+                  return (
+                    <TouchableOpacity
+                      key={record.date}
+                      onPress={() => selectDate(record.date)}
+                    >
+                      <XStack
+                        backgroundColor="$surface"
+                        borderRadius="$lg"
+                        borderWidth={1}
+                        borderColor="$borderColor"
+                        padding="$space.md"
+                        alignItems="center"
+                        gap="$space.md"
+                      >
+                        <View
+                          width={40}
+                          height={40}
+                          borderRadius={20}
+                          backgroundColor={cfg.colorValue}
+                          alignItems="center"
+                          justifyContent="center"
+                        >
+                          <Text fontSize={20}>{cfg.emoji}</Text>
+                        </View>
+                        <YStack flex={1}>
+                          <Text
+                            fontFamily="$heading"
+                            fontSize={15}
+                            color="$color"
+                          >
+                            {cfg.label}
+                          </Text>
+                          <Text fontSize={12} color="$color" opacity={0.5}>
+                            {formatShortDate(record.date)} · intensidad{" "}
+                            {record.intensity}/10
+                          </Text>
+                        </YStack>
+                        {record.reflection ? (
+                          <Text fontSize={12} color="$color" opacity={0.4}>
+                            💬
+                          </Text>
+                        ) : null}
+                      </XStack>
+                    </TouchableOpacity>
+                  );
+                })}
+              </YStack>
+            </YStack>
+          )}
+
           {/* Empty state */}
           {!monthHasRecords && (
             <YStack
-              flex={1}
               alignItems="center"
               justifyContent="center"
               paddingHorizontal="$space.xl"
+              paddingTop="$space.xxl"
+              paddingBottom="$space.xxl"
             >
               <Text fontSize={32} marginBottom="$space.md">
                 📅
@@ -156,7 +361,7 @@ export default function HistoryScreen() {
               </Text>
             </YStack>
           )}
-        </YStack>
+        </TScrollView>
       )}
 
       {/* ── STATISTICS VIEW ────────────────────────────────────────────────── */}
@@ -301,6 +506,200 @@ export default function HistoryScreen() {
                       />
                     ))}
                   </View>
+                </YStack>
+              )}
+
+              {/* Global summary */}
+              <YStack gap="$space.sm">
+                <Text
+                  fontFamily="$heading"
+                  fontSize={14}
+                  color="$color"
+                  opacity={0.7}
+                >
+                  Resumen global
+                </Text>
+                <XStack gap="$space.md">
+                  <View
+                    flex={1}
+                    backgroundColor="$surface"
+                    borderRadius="$lg"
+                    padding="$space.md"
+                    borderWidth={1}
+                    borderColor="$borderColor"
+                    alignItems="center"
+                  >
+                    <Text fontFamily="$heading" fontSize={32} color="$primary">
+                      {allRecords.length}
+                    </Text>
+                    <Text
+                      fontSize={12}
+                      color="$color"
+                      opacity={0.5}
+                      textAlign="center"
+                    >
+                      registros totales
+                    </Text>
+                  </View>
+                  <View
+                    flex={1}
+                    backgroundColor="$surface"
+                    borderRadius="$lg"
+                    padding="$space.md"
+                    borderWidth={1}
+                    borderColor="$borderColor"
+                    alignItems="center"
+                  >
+                    <Text fontFamily="$heading" fontSize={32} color="$primary">
+                      {globalAvgIntensity}
+                    </Text>
+                    <Text
+                      fontSize={12}
+                      color="$color"
+                      opacity={0.5}
+                      textAlign="center"
+                    >
+                      intensidad media
+                    </Text>
+                  </View>
+                </XStack>
+              </YStack>
+
+              {/* Detail stats grid */}
+              <YStack gap="$space.sm">
+                <Text
+                  fontFamily="$heading"
+                  fontSize={14}
+                  color="$color"
+                  opacity={0.7}
+                >
+                  Tus números
+                </Text>
+                <XStack gap="$space.md" flexWrap="wrap">
+                  <View
+                    flex={1}
+                    minWidth="40%"
+                    backgroundColor="$surface"
+                    borderRadius="$lg"
+                    padding="$space.md"
+                    borderWidth={1}
+                    borderColor="$borderColor"
+                  >
+                    <Text fontFamily="$heading" fontSize={22} color="$primary">
+                      {maxIntensity}/10
+                    </Text>
+                    <Text fontSize={12} color="$color" opacity={0.5}>
+                      intensidad máxima
+                    </Text>
+                  </View>
+                  <View
+                    flex={1}
+                    minWidth="40%"
+                    backgroundColor="$surface"
+                    borderRadius="$lg"
+                    padding="$space.md"
+                    borderWidth={1}
+                    borderColor="$borderColor"
+                  >
+                    <Text fontFamily="$heading" fontSize={22} color="$primary">
+                      {minIntensity}/10
+                    </Text>
+                    <Text fontSize={12} color="$color" opacity={0.5}>
+                      intensidad mínima
+                    </Text>
+                  </View>
+                  <View
+                    flex={1}
+                    minWidth="40%"
+                    backgroundColor="$surface"
+                    borderRadius="$lg"
+                    padding="$space.md"
+                    borderWidth={1}
+                    borderColor="$borderColor"
+                  >
+                    <Text fontFamily="$heading" fontSize={22} color="$primary">
+                      {reflectionsCount}
+                    </Text>
+                    <Text fontSize={12} color="$color" opacity={0.5}>
+                      reflexiones escritas
+                    </Text>
+                  </View>
+                  <View
+                    flex={1}
+                    minWidth="40%"
+                    backgroundColor="$surface"
+                    borderRadius="$lg"
+                    padding="$space.md"
+                    borderWidth={1}
+                    borderColor="$borderColor"
+                  >
+                    <Text fontFamily="$heading" fontSize={22} color="$primary">
+                      {bestStreakEver}
+                    </Text>
+                    <Text fontSize={12} color="$color" opacity={0.5}>
+                      mejor racha
+                    </Text>
+                  </View>
+                </XStack>
+              </YStack>
+
+              {/* Recent activity */}
+              {recentAllRecords.length > 0 && (
+                <YStack gap="$space.sm">
+                  <Text
+                    fontFamily="$heading"
+                    fontSize={14}
+                    color="$color"
+                    opacity={0.7}
+                  >
+                    Actividad reciente
+                  </Text>
+                  <YStack gap="$space.sm">
+                    {recentAllRecords.map((record) => {
+                      const cfg = EMOTION_CONFIG[record.emotion];
+                      return (
+                        <XStack
+                          key={record.date}
+                          backgroundColor="$surface"
+                          borderRadius="$lg"
+                          borderWidth={1}
+                          borderColor="$borderColor"
+                          padding="$space.md"
+                          alignItems="center"
+                          gap="$space.md"
+                        >
+                          <View
+                            width={40}
+                            height={40}
+                            borderRadius={20}
+                            backgroundColor={cfg.colorValue}
+                            alignItems="center"
+                            justifyContent="center"
+                          >
+                            <Text fontSize={20}>{cfg.emoji}</Text>
+                          </View>
+                          <YStack flex={1}>
+                            <Text
+                              fontFamily="$heading"
+                              fontSize={15}
+                              color="$color"
+                            >
+                              {cfg.label}
+                            </Text>
+                            <Text fontSize={12} color="$color" opacity={0.5}>
+                              {formatShortDate(record.date)} · intensidad{" "}
+                              {record.intensity}/10
+                            </Text>
+                          </YStack>
+                          {record.reflection ? (
+                            <Text fontSize={12} color="$color" opacity={0.4}>
+                              💬
+                            </Text>
+                          ) : null}
+                        </XStack>
+                      );
+                    })}
+                  </YStack>
                 </YStack>
               )}
             </YStack>

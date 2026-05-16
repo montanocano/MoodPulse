@@ -106,6 +106,24 @@ export async function cancelFriendRequest(requestId: string): Promise<void> {
   await deleteDoc(doc(db, "friendRequests", requestId));
 }
 
+export async function removeFriend(uid: string, friendUid: string): Promise<void> {
+  const [fromSnap, toSnap] = await Promise.all([
+    getDocs(query(
+      collection(db, "friendRequests"),
+      where("fromUid", "==", uid),
+      where("toUid", "==", friendUid),
+    )),
+    getDocs(query(
+      collection(db, "friendRequests"),
+      where("fromUid", "==", friendUid),
+      where("toUid", "==", uid),
+    )),
+  ]);
+  const docToDelete = [...fromSnap.docs, ...toSnap.docs]
+    .find((d) => d.data().status === "accepted");
+  if (docToDelete) await deleteDoc(docToDelete.ref);
+}
+
 export async function savePushToken(uid: string, token: string): Promise<void> {
   await setDoc(
     doc(db, "users", uid),

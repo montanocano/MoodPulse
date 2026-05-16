@@ -10,9 +10,11 @@ import {
   Input,
   useTheme,
 } from "tamagui";
+import { AppButton } from "../../components/AppButton";
 import * as ImagePicker from "expo-image-picker";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuthStore } from "../../../../features/auth/store/authStore";
 import { useSettingsStore } from "../../../../features/settings/store/settingsStore";
 import { uploadProfilePhoto } from "../../../utils/uploadProfilePhoto";
@@ -21,6 +23,7 @@ import * as notificationService from "../../../utils/notificationHelper";
 export default function ProfileScreen() {
   const theme = useTheme();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const {
     user,
     signOut,
@@ -201,10 +204,10 @@ export default function ProfileScreen() {
   }
 
   return (
+    <View flex={1} backgroundColor="$background" paddingTop={insets.top}>
     <ScrollView
       style={{ flex: 1, backgroundColor: theme.background?.val as string }}
       contentContainerStyle={{
-        paddingTop: 60,
         paddingHorizontal: 24,
         paddingBottom: 40,
       }}
@@ -279,31 +282,26 @@ export default function ProfileScreen() {
                 </Text>
               ) : null}
               <XStack gap="$space.sm" marginTop="$space.xs">
-                <Button
-                  flex={1}
+                <AppButton
+                  label="Guardar"
                   onPress={handleSaveName}
                   disabled={nameLoading}
-                  backgroundColor="$primary"
-                  borderRadius="$md"
-                >
-                  <Text color="$white" fontWeight="600">
-                    Guardar
-                  </Text>
-                </Button>
-                <Button
+                  loading={nameLoading}
+                  variant="primary"
+                  shape="rounded"
                   flex={1}
+                />
+                <AppButton
+                  label="Cancelar"
                   onPress={() => {
                     setEditingName(false);
                     setNameError("");
                     setNameValue(user?.displayName ?? "");
                   }}
-                  backgroundColor="$surface"
-                  borderWidth={1}
-                  borderColor="$borderColor"
-                  borderRadius="$md"
-                >
-                  <Text color="$color">Cancelar</Text>
-                </Button>
+                  variant="secondary"
+                  shape="rounded"
+                  flex={1}
+                />
               </XStack>
             </YStack>
           ) : (
@@ -458,29 +456,24 @@ export default function ProfileScreen() {
           )}
         </YStack>
 
-        {/* ── Sign out ──────────────────────────────────────────────── */}
-        <Button
+        <AppButton
+          label="Cerrar sesión"
           onPress={handleSignOut}
           disabled={loading}
-          backgroundColor="$surface"
-          borderWidth={1}
-          borderColor="$borderColor"
-          borderRadius="$md"
-        >
-          <Text color="$color">Cerrar sesión</Text>
-        </Button>
+          variant="secondary"
+          shape="rounded"
+          fullWidth
+        />
 
-        {/* ── Delete account ────────────────────────────────────────── */}
-        <Button
+        <AppButton
+          label="Eliminar cuenta"
           onPress={handleDeleteAccount}
-          backgroundColor="$surface"
-          borderWidth={1}
-          borderColor="$emotionAngry"
-          borderRadius="$md"
-        >
-          <Text color="$emotionAngry">Eliminar cuenta</Text>
-        </Button>
+          variant="danger"
+          shape="rounded"
+          fullWidth
+        />
       </YStack>
     </ScrollView>
+    </View>
   );
 }

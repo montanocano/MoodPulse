@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { ScrollView } from "react-native";
-import { Button, Input, Spinner, Text, View, YStack } from "tamagui";
+import { Input, Text, View, YStack } from "tamagui";
+import { AppButton } from "../../components/AppButton";
 import { useRouter } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuthStore } from "../../../../features/auth/store/authStore";
 import { PasswordInput } from "../../components/PasswordInput";
 
@@ -18,6 +20,7 @@ interface FieldErrors {
 
 export default function RegisterScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { register, loading, error, clearError } = useAuthStore();
 
   const [nombre, setNombre] = useState("");
@@ -48,7 +51,7 @@ export default function RegisterScreen() {
   }
 
   return (
-    <View flex={1} backgroundColor="$background">
+    <View flex={1} backgroundColor="$background" paddingTop={insets.top}>
       <ScrollView
         contentContainerStyle={{
           flexGrow: 1,
@@ -184,21 +187,16 @@ export default function RegisterScreen() {
               </Text>
             )}
 
-            {/* Submit */}
-            <Button
+            <AppButton
+              label="Registrarse"
               onPress={handleRegister}
               disabled={loading}
-              backgroundColor="$primary"
-              borderRadius={9999}
-              height={48}
-              marginTop={4}
-              // @ts-expect-error color is valid via ButtonContext but absent from outer prop types
-              color="white"
-              fontWeight="700"
-              fontSize={15}
-            >
-              {loading ? <Spinner color="$white" /> : "Registrarse"}
-            </Button>
+              loading={loading}
+              variant="primary"
+              shape="pill"
+              size="lg"
+              fullWidth
+            />
           </YStack>
 
           {/* Back link */}

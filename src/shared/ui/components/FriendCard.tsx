@@ -1,15 +1,30 @@
+import { Alert } from "react-native";
 import { Image } from "expo-image";
 import { Text, View, XStack, YStack } from "tamagui";
+import { Ionicons } from "@expo/vector-icons";
+import { TouchableOpacity } from "react-native";
 import type { FriendSummary } from "../../../features/social/types";
 
 interface Props {
   friend: FriendSummary;
+  onRemove: () => void;
 }
 
-export function FriendCard({ friend }: Props) {
+export function FriendCard({ friend, onRemove }: Props) {
   const initials = friend.nombre.slice(0, 2).toUpperCase();
   const visibleAchievements = friend.achievements.slice(0, 4);
   const extra = friend.achievements.length - 4;
+
+  function handleRemove() {
+    Alert.alert(
+      "Eliminar amigo",
+      `¿Seguro que quieres eliminar a ${friend.nombre}?`,
+      [
+        { text: "Cancelar", style: "cancel" },
+        { text: "Eliminar", style: "destructive", onPress: onRemove },
+      ],
+    );
+  }
 
   return (
     <XStack
@@ -71,6 +86,11 @@ export function FriendCard({ friend }: Props) {
           </XStack>
         )}
       </YStack>
+
+      {/* Remove button */}
+      <TouchableOpacity onPress={handleRemove} hitSlop={8}>
+        <Ionicons name="person-remove-outline" size={20} color="#E74C3C" />
+      </TouchableOpacity>
     </XStack>
   );
 }
